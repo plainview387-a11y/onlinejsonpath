@@ -1,0 +1,157 @@
+'use client';
+
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Code, 
+  User as UserIcon, 
+  LogOut, 
+  Wrench, 
+  Braces, 
+  Lock, 
+  Clock, 
+  FileJson, 
+  FileText, 
+  Image,
+  Globe
+} from 'lucide-react';
+
+const tools = [
+  { href: '/tools/jsonpath', label: 'JSONPath解析', icon: Braces },
+  { href: '/tools/base64', label: 'Base64加解密', icon: Lock },
+  { href: '/tools/timestamp', label: '时间戳转换', icon: Clock },
+  { href: '/tools/json-escape', label: 'JSON转义', icon: FileJson },
+  { href: '/tools/text-stats', label: '文本统计', icon: FileText },
+  { href: '/tools/image-base64', label: '图片Base64', icon: Image },
+  { href: '/tools/ip-query', label: 'IP查询', icon: Globe },
+];
+
+export function Navigation() {
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <Code className="h-6 w-6" />
+          <span className="text-lg font-bold">在线工具集</span>
+        </Link>
+
+        {/* Nav Items */}
+        <div className="hidden md:flex items-center space-x-1">
+          {/* 首页 */}
+          <Link
+            href="/"
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+              pathname === '/'
+                ? 'bg-accent text-accent-foreground'
+                : 'text-muted-foreground'
+            }`}
+          >
+            首页
+          </Link>
+
+          {/* 工具列表下拉菜单 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  pathname.startsWith('/tools')
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground'
+                }`}
+              >
+                <Wrench className="h-4 w-4 mr-1" />
+                工具箱
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              {tools.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <DropdownMenuItem key={tool.href} asChild>
+                    <Link href={tool.href} className="cursor-pointer">
+                      <Icon className="h-4 w-4 mr-2" />
+                      {tool.label}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Auth Section */}
+        <div className="flex items-center space-x-2">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatar} alt={user.nickname} />
+                    <AvatarFallback>{user.nickname[0]}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user.nickname}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    个人中心
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  退出登录
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  登录
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm">
+                  注册
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
