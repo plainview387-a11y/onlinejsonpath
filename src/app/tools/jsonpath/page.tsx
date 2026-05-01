@@ -153,7 +153,7 @@ export default function JsonPathPage() {
     }
 
     if (!validateJson(jsonInput)) {
-      setError(`JSON格式错误（行 ${currentParseError?.line ?? parseError?.line ?? 1}）`);
+      setError(`JSON格式错误（行 ${currentParseError?.line ?? 1}）`);
       return;
     }
 
