@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -168,6 +168,12 @@ export default function JsonPathPage() {
       setError('JSONPath查询失败: ' + (err as Error).message);
     }
   };
+
+  useEffect(() => {
+    if (jsonInput && jsonPath && !result && !error) {
+      executeQuery();
+    }
+  }, []);
 
   // 格式化JSON
   const formatJson = () => {
