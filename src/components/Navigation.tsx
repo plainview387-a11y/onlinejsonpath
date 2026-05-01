@@ -9,24 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Code, 
-  User as UserIcon, 
-  LogOut, 
-  Wrench, 
-  Braces, 
-  Lock, 
-  Clock, 
-  FileJson, 
-  FileText, 
+import {
+  Code,
+  User as UserIcon,
+  LogOut,
+  Wrench,
+  Braces,
+  Lock,
+  Clock,
+  FileJson,
+  FileText,
   Image,
-  Globe
+  Globe,
 } from 'lucide-react';
 
 const tools = [
@@ -52,38 +49,30 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Code className="h-6 w-6" />
           <span className="text-lg font-bold">在线工具集</span>
         </Link>
 
-        {/* Nav Items */}
-        <div className="hidden md:flex items-center space-x-1">
-          {/* 首页 */}
+        <div className="hidden items-center space-x-1 md:flex">
           <Link
             href="/"
-            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
-              pathname === '/'
-                ? 'bg-accent text-accent-foreground'
-                : 'text-muted-foreground'
+            className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+              pathname === '/' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             }`}
           >
             首页
           </Link>
 
-          {/* 工具列表下拉菜单 */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname.startsWith('/tools')
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-muted-foreground'
+              <Button
+                variant="ghost"
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname.startsWith('/tools') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
                 }`}
               >
-                <Wrench className="h-4 w-4 mr-1" />
+                <Wrench className="mr-1 h-4 w-4" />
                 工具箱
               </Button>
             </DropdownMenuTrigger>
@@ -93,7 +82,7 @@ export function Navigation() {
                 return (
                   <DropdownMenuItem key={tool.href} asChild>
                     <Link href={tool.href} className="cursor-pointer">
-                      <Icon className="h-4 w-4 mr-2" />
+                      <Icon className="mr-2 h-4 w-4" />
                       {tool.label}
                     </Link>
                   </DropdownMenuItem>
@@ -103,7 +92,6 @@ export function Navigation() {
           </DropdownMenu>
         </div>
 
-        {/* Auth Section */}
         <div className="flex items-center space-x-2">
           {user ? (
             <DropdownMenu>
@@ -144,9 +132,7 @@ export function Navigation() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="sm">
-                  注册
-                </Button>
+                <Button size="sm">注册</Button>
               </Link>
             </div>
           )}

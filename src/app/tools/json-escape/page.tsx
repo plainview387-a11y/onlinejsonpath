@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ToolLayout, ActionButtons } from '@/components/ToolComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,18 +9,17 @@ import { JsonEditor, JsonViewer } from '@/components/JsonEditor';
 import { CommentSection } from '@/components/CommentSection';
 
 const defaultJson = {
-  name: "张三",
+  name: '张三',
   age: 25,
-  email: "zhangsan@example.com",
+  email: 'zhangsan@example.com',
   address: {
-    city: "北京",
-    street: "朝阳路"
-  }
+    city: '北京',
+    street: '朝阳路',
+  },
 };
 
 const defaultEscaped = '{"name":"张三","age":25,"email":"zhangsan@example.com","address":{"city":"北京","street":"朝阳路"}}';
 
-// 普通文本编辑器（用于转义文本输入）
 function TextEditor({
   value,
   onChange,
@@ -33,10 +32,10 @@ function TextEditor({
   readOnly?: boolean;
 }) {
   return (
-    <div className="relative h-full min-h-[300px] rounded-lg border border-border bg-background overflow-hidden">
+    <div className="relative h-full min-h-[300px] overflow-hidden rounded-lg border border-border bg-background">
       {!value && (
         <div className="absolute inset-0 flex items-start justify-start p-4 pointer-events-none">
-          <span className="text-muted-foreground/50 font-mono text-sm">{placeholder}</span>
+          <span className="font-mono text-sm text-muted-foreground/50">{placeholder}</span>
         </div>
       )}
       <textarea
@@ -44,7 +43,7 @@ function TextEditor({
         onChange={(e) => onChange?.(e.target.value)}
         readOnly={readOnly}
         placeholder=""
-        className="w-full h-full min-h-[300px] p-4 font-mono text-sm resize-none focus:outline-none bg-transparent"
+        className="h-full min-h-[300px] w-full resize-none bg-transparent p-4 font-mono text-sm focus:outline-none"
       />
     </div>
   );
@@ -52,12 +51,7 @@ function TextEditor({
 
 export default function JsonEscapePage() {
   const [mode, setMode] = useState<'escape' | 'unescape'>('escape');
-  const defaultInput = useMemo(
-    () => (mode === 'escape' ? JSON.stringify(defaultJson, null, 2) : defaultEscaped),
-    [mode]
-  );
-
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(JSON.stringify(defaultJson, null, 2));
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [inputError, setInputError] = useState(false);
@@ -79,7 +73,6 @@ export default function JsonEscapePage() {
     }
   };
 
-  // JSON转义
   const escapeJson = () => {
     setError('');
     setInputError(false);
@@ -89,11 +82,9 @@ export default function JsonEscapePage() {
     }
 
     try {
-      // 先验证是否为有效JSON
       JSON.parse(input);
-      // 转义：压缩JSON并转义特殊字符
       const escaped = JSON.stringify(JSON.stringify(JSON.parse(input)));
-      setOutput(escaped.slice(1, -1)); // 去掉外层引号
+      setOutput(escaped.slice(1, -1));
     } catch (err) {
       setError('JSON格式错误：' + (err as Error).message);
       setInputError(true);
@@ -101,7 +92,6 @@ export default function JsonEscapePage() {
     }
   };
 
-  // 转义文本转JSON
   const unescapeJson = () => {
     setError('');
     if (!input) {
@@ -110,7 +100,6 @@ export default function JsonEscapePage() {
     }
 
     try {
-      // 尝试解析转义的JSON
       const unescaped = JSON.parse(`"${input}"`);
       const parsed = JSON.parse(unescaped);
       setOutput(JSON.stringify(parsed, null, 2));
@@ -122,39 +111,32 @@ export default function JsonEscapePage() {
 
   const handleFormat = () => {
     if (mode === 'escape') {
-      try {
-        const formatted = formatJson(input);
-        setInput(formatted);
-        setInputError(false);
-      } catch {
-        // 格式化失败
-      }
+      const formatted = formatJson(input);
+      setInput(formatted);
+      setInputError(false);
     } else {
       setOutput(formatJson(output));
     }
   };
 
   const handleClear = () => {
-    setInput('');
+    setInput(mode === 'escape' ? JSON.stringify(defaultJson, null, 2) : defaultEscaped);
     setOutput('');
     setError('');
     setInputError(false);
   };
 
   return (
-    <ToolLayout
-      title="JSON 转义 / 反转义工具"
-      description="JSON转义与反转义，支持格式化和错误提示"
-    >
+    <ToolLayout title="JSON 转义 / 反转义工具" description="JSON 转义与反转义，支持格式化和错误提示">
       <Tabs value={mode} onValueChange={(v) => handleModeChange(v as 'escape' | 'unescape')}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 rounded-2xl">
           <TabsTrigger value="escape">JSON转义</TabsTrigger>
           <TabsTrigger value="unescape">转义文本转JSON</TabsTrigger>
         </TabsList>
 
         <TabsContent value="escape" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card className="shadow-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">JSON 输入</CardTitle>
@@ -167,16 +149,11 @@ export default function JsonEscapePage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <JsonEditor
-                  value={input}
-                  onChange={setInput}
-                  placeholder="输入JSON文本..."
-                  error={inputError}
-                />
+                <JsonEditor value={input} onChange={setInput} placeholder="输入JSON文本..." error={inputError} />
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">转义结果</CardTitle>
@@ -185,30 +162,26 @@ export default function JsonEscapePage() {
               </CardHeader>
               <CardContent>
                 {error ? (
-                  <div className="w-full h-[300px] flex items-center justify-center border rounded-lg bg-red-50 text-red-600 p-4 text-center">
+                  <div className="flex h-[300px] w-full items-center justify-center rounded-lg border bg-red-50 p-4 text-center text-red-600">
                     {error}
                   </div>
                 ) : (
-                  <TextEditor
-                    value={output}
-                    placeholder="转义后的文本..."
-                    readOnly
-                  />
+                  <TextEditor value={output} placeholder="转义后的文本..." readOnly />
                 )}
               </CardContent>
             </Card>
           </div>
 
           <div className="flex justify-center">
-            <Button onClick={escapeJson} size="lg">
+            <Button onClick={escapeJson} size="lg" className="rounded-full px-8">
               执行转义
             </Button>
           </div>
         </TabsContent>
 
         <TabsContent value="unescape" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card className="shadow-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">转义文本输入</CardTitle>
@@ -216,15 +189,11 @@ export default function JsonEscapePage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <TextEditor
-                  value={input || defaultInput}
-                  onChange={setInput}
-                  placeholder="输入转义后的文本..."
-                />
+                <TextEditor value={input} onChange={setInput} placeholder="输入转义后的文本..." />
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">JSON 结果</CardTitle>
@@ -238,7 +207,7 @@ export default function JsonEscapePage() {
               </CardHeader>
               <CardContent>
                 {error ? (
-                  <div className="w-full h-[300px] flex items-center justify-center border rounded-lg bg-red-50 text-red-600 p-4 text-center">
+                  <div className="flex h-[300px] w-full items-center justify-center rounded-lg border bg-red-50 p-4 text-center text-red-600">
                     {error}
                   </div>
                 ) : (
@@ -249,14 +218,13 @@ export default function JsonEscapePage() {
           </div>
 
           <div className="flex justify-center">
-            <Button onClick={unescapeJson} size="lg">
+            <Button onClick={unescapeJson} size="lg" className="rounded-full px-8">
               执行反转义
             </Button>
           </div>
         </TabsContent>
       </Tabs>
 
-      {/* 评论区 */}
       <CommentSection pageKey="json-escape" />
     </ToolLayout>
   );

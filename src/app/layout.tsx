@@ -6,8 +6,8 @@ import { Navigation } from '@/components/Navigation';
 
 export const metadata: Metadata = {
   title: {
-    default: '在线工具集 | 扣子编程',
-    template: '%s | 扣子编程',
+    default: '在线工具集 | OnlineJsonPath',
+    template: '%s | OnlineJsonPath',
   },
   description: '在线工具集 - JSONPath解析、Base64加解密、时间戳转换、JSON转义、文本统计、图片Base64互转',
   keywords: [
@@ -34,9 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           {isDev && <Inspector />}
           <Navigation />
-          <main className="min-h-[calc(100vh-4rem)]">
-            {children}
-          </main>
+          <main className="min-h-[calc(100vh-4rem)]">{children}</main>
         </AuthProvider>
       </body>
     </html>
