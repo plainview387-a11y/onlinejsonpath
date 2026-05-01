@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,10 +100,22 @@ const syntaxExamples = [
   },
 ];
 
+function getDefaultJsonPathResult() {
+  try {
+    const queryResult = JSONPath({
+      path: '$.store.book[*].author',
+      json: defaultJson,
+    });
+    return JSON.stringify(queryResult, null, 2);
+  } catch {
+    return '';
+  }
+}
+
 export default function JsonPathPage() {
   const [jsonInput, setJsonInput] = useState(JSON.stringify(defaultJson, null, 2));
   const [jsonPath, setJsonPath] = useState('$.store.book[*].author');
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState(() => getDefaultJsonPathResult());
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -169,18 +181,12 @@ export default function JsonPathPage() {
     }
   };
 
-  useEffect(() => {
-    if (jsonInput && jsonPath && !result && !error) {
-      executeQuery();
-    }
-  }, []);
-
   // 格式化JSON
   const formatJson = () => {
     try {
       const parsed = JSON.parse(jsonInput);
       setJsonInput(JSON.stringify(parsed, null, 2));
-    } catch (err) {
+    } catch {
       // 格式化失败
     }
   };
