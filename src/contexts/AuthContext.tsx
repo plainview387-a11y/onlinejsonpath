@@ -42,7 +42,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('user');
       }
     }
-    setIsLoading(false);
+
+    const timer = setTimeout(() => setIsLoading(false), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const login = (newToken: string, newUser: User) => {

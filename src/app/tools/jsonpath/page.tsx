@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -194,7 +194,7 @@ export default function JsonPathPage() {
     setJsonPath(path);
   };
 
-  const currentParseError = useMemo(() => {
+  const currentParseError = (() => {
     if (!jsonInput) return null;
     try {
       JSON.parse(jsonInput);
@@ -209,7 +209,7 @@ export default function JsonPathPage() {
       }
       return { line: 1, message };
     }
-  }, [jsonInput]);
+  })();
 
   return (
     <div className="container mx-auto px-4 py-8">
