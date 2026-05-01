@@ -1,37 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { ToolLayout, EditorPanel, ActionButtons } from '@/components/ToolComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CommentSection } from '@/components/CommentSection';
 
 export default function TextStatsPage() {
   const [text, setText] = useState('');
-  const [stats, setStats] = useState({
-    characters: 0,
-    charactersNoSpaces: 0,
-    spaces: 0,
-    lines: 0,
-    paragraphs: 0,
-    words: 0,
-  });
-
-  useEffect(() => {
+  const stats = useMemo(() => {
     const characters = text.length;
     const spaces = (text.match(/\s/g) || []).length;
     const charactersNoSpaces = characters - spaces;
     const lines = text ? text.split('\n').length : 0;
-    const paragraphs = text ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0;
+    const paragraphs = text ? text.split(/\n\s*\n/).filter((p) => p.trim()).length : 0;
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
-    setStats({
+    return {
       characters,
       charactersNoSpaces,
       spaces,
       lines,
       paragraphs,
       words,
-    });
+    };
   }, [text]);
 
   const statItems = [

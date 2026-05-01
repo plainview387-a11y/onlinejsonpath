@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -105,7 +105,6 @@ export default function JsonPathPage() {
   const [jsonPath, setJsonPath] = useState('$.store.book[*].author');
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
-  const [parseError, setParseError] = useState<{ line: number; message: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   // 预计算每个语法示例的真实结果
@@ -132,18 +131,8 @@ export default function JsonPathPage() {
   const validateJson = (str: string): boolean => {
     try {
       JSON.parse(str);
-      setParseError(null);
       return true;
-    } catch (err) {
-      const match = (err as Error).message.match(/position (\d+)/);
-      if (match) {
-        const position = parseInt(match[1]);
-        const lines = str.substring(0, position).split('\n');
-        const line = lines.length;
-        setParseError({ line, message: (err as Error).message });
-      } else {
-        setParseError({ line: 1, message: (err as Error).message });
-      }
+    } catch {
       return false;
     }
   };
@@ -164,7 +153,7 @@ export default function JsonPathPage() {
     }
 
     if (!validateJson(jsonInput)) {
-      setError(`JSON格式错误（行 ${parseError?.line}）`);
+      setError(`JSON格式错误（行 ${currentParseError?.line ?? parseError?.line ?? 1}）`);
       return;
     }
 
@@ -185,7 +174,6 @@ export default function JsonPathPage() {
     try {
       const parsed = JSON.parse(jsonInput);
       setJsonInput(JSON.stringify(parsed, null, 2));
-      setParseError(null);
     } catch (err) {
       // 格式化失败
     }
@@ -202,12 +190,25 @@ export default function JsonPathPage() {
   };
 
   // 使用示例JSONPath
-  const useExample = (path: string) => {
+  const applyExample = (path: string) => {
     setJsonPath(path);
   };
 
-  useEffect(() => {
-    validateJson(jsonInput);
+  const currentParseError = useMemo(() => {
+    if (!jsonInput) return null;
+    try {
+      JSON.parse(jsonInput);
+      return null;
+    } catch (err) {
+      const message = (err as Error).message;
+      const match = message.match(/position (\d+)/);
+      if (match) {
+        const position = parseInt(match[1]);
+        const lines = jsonInput.substring(0, position).split('\n');
+        return { line: lines.length, message };
+      }
+      return { line: 1, message };
+    }
   }, [jsonInput]);
 
   return (
@@ -229,9 +230,9 @@ export default function JsonPathPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
                   JSON 输入
-                  {parseError && (
+                  {currentParseError && (
                     <span className="text-sm font-normal text-red-500 ml-2">
-                      (错误: 行 {parseError.line})
+                      (错误: 行 {currentParseError.line})
                     </span>
                   )}
                 </CardTitle>
@@ -360,7 +361,7 @@ export default function JsonPathPage() {
                         </div>
                       </td>
                       <td className="py-3 px-3">
-                        <Button size="sm" variant="ghost" onClick={() => useExample(item.example)}>
+                        <Button size="sm" variant="ghost" onClick={() => applyExample(item.example)}>
                           使用
                         </Button>
                       </td>

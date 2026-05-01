@@ -14,13 +14,7 @@ export default function Base64Page() {
   const [autoConvert, setAutoConvert] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (autoConvert) {
-      convert();
-    }
-  }, [input, isEncode, autoConvert]);
-
-  const convert = () => {
+  function convert() {
     setError('');
     if (!input) {
       setOutput('');

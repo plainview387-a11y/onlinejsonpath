@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, startTransition } from 'react';
 
 export interface User {
   id: string;
@@ -33,8 +33,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (savedToken && savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        setToken(savedToken);
-        setUser(parsedUser);
+        startTransition(() => {
+          setToken(savedToken);
+          setUser(parsedUser);
+        });
       } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');

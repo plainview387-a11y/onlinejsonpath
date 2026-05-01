@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { ToolLayout, ActionButtons } from '@/components/ToolComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -52,21 +52,23 @@ function TextEditor({
 
 export default function JsonEscapePage() {
   const [mode, setMode] = useState<'escape' | 'unescape'>('escape');
+  const defaultInput = useMemo(
+    () => (mode === 'escape' ? JSON.stringify(defaultJson, null, 2) : defaultEscaped),
+    [mode]
+  );
+
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [inputError, setInputError] = useState(false);
 
-  useEffect(() => {
-    if (mode === 'escape') {
-      setInput(JSON.stringify(defaultJson, null, 2));
-    } else {
-      setInput(defaultEscaped);
-    }
+  const handleModeChange = (nextMode: 'escape' | 'unescape') => {
+    setMode(nextMode);
+    setInput(nextMode === 'escape' ? JSON.stringify(defaultJson, null, 2) : defaultEscaped);
     setOutput('');
     setError('');
     setInputError(false);
-  }, [mode]);
+  };
 
   const formatJson = (str: string): string => {
     try {
@@ -144,7 +146,7 @@ export default function JsonEscapePage() {
       title="JSON 转义 / 反转义工具"
       description="JSON转义与反转义，支持格式化和错误提示"
     >
-      <Tabs value={mode} onValueChange={(v) => setMode(v as 'escape' | 'unescape')}>
+      <Tabs value={mode} onValueChange={(v) => handleModeChange(v as 'escape' | 'unescape')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="escape">JSON转义</TabsTrigger>
           <TabsTrigger value="unescape">转义文本转JSON</TabsTrigger>
@@ -215,7 +217,7 @@ export default function JsonEscapePage() {
               </CardHeader>
               <CardContent>
                 <TextEditor
-                  value={input}
+                  value={input || defaultInput}
                   onChange={setInput}
                   placeholder="输入转义后的文本..."
                 />
