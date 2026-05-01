@@ -267,7 +267,7 @@ export default function JsonPathPage() {
                 onChange={setJsonInput}
                 placeholder="输入JSON数据..."
                 height="400px"
-                error={!!parseError}
+                error={!!currentParseError}
               />
               <p className="text-xs text-muted-foreground mt-2">
                 大小限制：≤5MB
