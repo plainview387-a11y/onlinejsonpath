@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { authFetch, readStoredUser } from '@/lib/auth-client';
 
 interface Comment {
   id: string;
@@ -90,19 +91,6 @@ function getInitial(name?: string) {
   return name?.trim().slice(0, 1).toUpperCase() || 'U';
 }
 
-function readStoredUser() {
-  if (typeof window === 'undefined') return null;
-
-  const userStr = localStorage.getItem('user');
-  if (!userStr) return null;
-
-  try {
-    return JSON.parse(userStr) as { id: string; nickname: string; avatar: string };
-  } catch {
-    return null;
-  }
-}
-
 function getLocalLikesKey(pageKey: string) {
   return `comment-liked:${pageKey}`;
 }
@@ -126,14 +114,8 @@ function HistoryModal({
   const fetchMyComments = useCallback(async (page: number = 1) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(
+      const res = await authFetch(
         `/api/comments/my-comments?page=${page}&pageSize=${pagination.pageSize}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       );
       const data = await res.json();
 
@@ -403,12 +385,10 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/comments', {
+      const res = await authFetch('/api/comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           pageKey,
