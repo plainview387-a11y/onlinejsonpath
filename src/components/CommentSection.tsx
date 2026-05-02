@@ -14,6 +14,7 @@ import {
   Send,
   SmilePlus,
   Sparkles,
+  Trash2,
   User,
   X,
 } from 'lucide-react';
@@ -236,6 +237,8 @@ function CommentItem({
   comment,
   onReply,
   onLike,
+  onDelete,
+  canDelete,
   liked,
   likeCount,
   isReply = false,
@@ -243,6 +246,8 @@ function CommentItem({
   comment: Comment;
   onReply: (comment: Comment) => void;
   onLike: (commentId: string) => void;
+  onDelete: (comment: Comment) => void;
+  canDelete: boolean;
   liked: boolean;
   likeCount: number;
   isReply?: boolean;
@@ -284,6 +289,17 @@ function CommentItem({
             <Heart className={cn('mr-1 h-3.5 w-3.5', liked && 'fill-current')} />
             {likeCount > 0 ? likeCount : '赞'}
           </Button>
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 rounded-full px-2 text-xs text-muted-foreground hover:text-destructive"
+              onClick={() => onDelete(comment)}
+            >
+              <Trash2 className="mr-1 h-3.5 w-3.5" />
+              删除
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -455,6 +471,32 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
       }
       return next;
     });
+  };
+
+  const handleDelete = async (comment: Comment) => {
+    if (!user) {
+      toast.error('请先登录');
+      return;
+    }
+
+    const confirmed = window.confirm('确认删除这条评论吗？');
+    if (!confirmed) return;
+
+    try {
+      const res = await authFetch(`/api/comments?id=${encodeURIComponent(comment.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success('评论已删除');
+        fetchComments(1);
+      } else {
+        toast.error(data.error || '删除评论失败');
+      }
+    } catch {
+      toast.error('网络错误');
+    }
   };
 
   const goToPage = (page: number) => {
@@ -629,6 +671,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                       comment={comment}
                       onReply={handleReply}
                       onLike={toggleLike}
+                      onDelete={handleDelete}
+                      canDelete={user?.id === comment.user.id && (comment.replies?.length || 0) === 0}
                       liked={likedIds.has(comment.id)}
                       likeCount={likedIds.has(comment.id) ? 1 : 0}
                     />
@@ -642,6 +686,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                               comment={reply}
                               onReply={handleReply}
                               onLike={toggleLike}
+                              onDelete={handleDelete}
+                              canDelete={user?.id === reply.user.id}
                               liked={likedIds.has(reply.id)}
                               likeCount={likedIds.has(reply.id) ? 1 : 0}
                               isReply

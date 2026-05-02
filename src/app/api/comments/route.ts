@@ -355,3 +355,104 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// DELETE: 删除当前用户自己的评论
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: '请先登录' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = verifyToken(token);
+
+    if (!decoded) {
+      return NextResponse.json(
+        { error: '登录已过期，请重新登录' },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const commentId = searchParams.get('id');
+
+    if (!commentId) {
+      return NextResponse.json(
+        { error: '缺少评论 ID' },
+        { status: 400 }
+      );
+    }
+
+    const client = getSupabaseClient();
+
+    const { data: comment, error: commentError } = await client
+      .from('comments')
+      .select('id, user_id, parent_id')
+      .eq('id', commentId)
+      .single();
+
+    if (commentError || !comment) {
+      return NextResponse.json(
+        { error: '评论不存在' },
+        { status: 404 }
+      );
+    }
+
+    if (comment.user_id !== decoded.userId) {
+      return NextResponse.json(
+        { error: '只能删除自己的评论' },
+        { status: 403 }
+      );
+    }
+
+    if (!comment.parent_id) {
+      const { count, error: repliesError } = await client
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('parent_id', commentId);
+
+      if (repliesError) {
+        return NextResponse.json(
+          { error: '删除前检查回复失败' },
+          { status: 500 }
+        );
+      }
+
+      if ((count || 0) > 0) {
+        return NextResponse.json(
+          { error: '该主评论下已有回复，暂不支持直接删除' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const { error: deleteError } = await client
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('user_id', decoded.userId);
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: '删除评论失败' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: '评论删除成功',
+      data: { id: commentId },
+    });
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    return NextResponse.json(
+      { error: '服务器错误' },
+      { status: 500 }
+    );
+  }
+}
