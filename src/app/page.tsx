@@ -154,9 +154,9 @@ export default function HomePage() {
 
       {/* 主推工具 */}
       <div className="grid grid-cols-1 items-start gap-4 mb-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <Link href="/tools/jsonpath">
+        <Link href="/tools/jsonpath" className="self-start">
           <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-blue-50 via-background to-cyan-50 hover:shadow-lg transition-all cursor-pointer group">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-5 md:p-6 lg:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div className="max-w-2xl">
                   <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
