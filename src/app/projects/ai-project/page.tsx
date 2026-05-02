@@ -203,8 +203,8 @@ function SectionHeading({
 export default function AIProjectPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-14">
-        <div className="flex flex-col justify-center">
+      <section className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-10 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-14">
+        <div className="flex flex-col pt-6 md:pt-10">
           <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-sm">
             作品集 / 在线简历 / 项目展示页
           </Badge>
