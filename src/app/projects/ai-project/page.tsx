@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 const profile = {
-  name: '牛晓龙',
+  name: 'xxx',
   role: '前端开发 / 全栈开发 / 产品实现',
   location: '上海',
   tagline:
@@ -31,7 +31,7 @@ const profile = {
   phone: '18155884720',
   school: '池州学院',
   major: '数据科学与大数据技术',
-  resumeUrl: '/牛晓龙-2024ss-简历.pdf',
+  resumeUrl: '/xxx-resume.pdf',
   avatarInitials: 'NX',
   status: '可交流前端 / 全栈 / 实施开发相关机会',
   availability: '期望工作地点上海，期望岗位偏实施工程师 / 前端开发 / 系统开发',
