@@ -245,6 +245,27 @@ export default function IPQueryPage() {
       </div>
 
       {/* 评论区 */}
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>IP 查询工具支持查看当前 IP 或指定 IP 的归属地、运营商和地理位置信息，适合网络排查、登录风险判断和安全分析。</p>
+            <p>如果你在处理访问日志、风控记录或用户来源判断，这个工具可以帮助你快速得到基础网络信息。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>为什么定位不是特别精确？<br /><strong>A：</strong>IP 查询通常只能定位到运营商或城市级别，不能保证精确到具体地址。</p>
+            <p><strong>Q：</strong>适合哪些场景？<br /><strong>A：</strong>登录风险排查、服务访问来源分析、接口调试和运营数据核对都很常见。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="ip-query" />
     </ToolLayout>
   );

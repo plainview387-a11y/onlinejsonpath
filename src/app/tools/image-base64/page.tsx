@@ -210,6 +210,27 @@ export default function ImageBase64Page() {
       </Tabs>
 
       {/* 评论区 */}
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>图片 Base64 工具适合前端开发、接口联调和数据内联场景，支持图片上传转 Base64，也支持把 Base64 内容重新还原成图片预览。</p>
+            <p>当你需要快速验证图片字符串是否可用、或者生成临时 data URL 时，这个工具会比手工处理方便很多。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>为什么图片无法预览？<br /><strong>A：</strong>通常是 Base64 内容不完整，或者缺少正确的 MIME 前缀。</p>
+            <p><strong>Q：</strong>适合什么场景？<br /><strong>A：</strong>前端调试、接口联调、邮件模板、临时内联图片和快速验图都很适合。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="image-base64" />
     </ToolLayout>
   );

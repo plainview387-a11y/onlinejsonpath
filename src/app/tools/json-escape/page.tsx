@@ -225,6 +225,27 @@ export default function JsonEscapePage() {
         </TabsContent>
       </Tabs>
 
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>JSON 转义工具适合处理接口字符串、日志内容和需要嵌入 JSON 的文本片段，支持转义与反转义双向操作。</p>
+            <p>如果你在拼接请求体、排查转义字符异常或处理存量数据，这个工具会比手工替换更稳定也更直观。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>什么时候需要 JSON 转义？<br /><strong>A：</strong>当 JSON 要被嵌入字符串、脚本或其他 JSON 字段中时，通常需要先转义。</p>
+            <p><strong>Q：</strong>为什么反转义后还是报错？<br /><strong>A：</strong>可能原始内容本身就不是合法 JSON，建议结合格式化结果一起检查。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="json-escape" />
     </ToolLayout>
   );

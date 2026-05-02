@@ -454,6 +454,27 @@ export default function JavaToNodePage() {
       </div>
 
       {/* 评论区 */}
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>Java 转 Node.js 工具适合做代码迁移、学习对照和快速原型验证，可以把常见 Java 结构转换成更接近 Node.js 的写法。</p>
+            <p>它更适合做“初步转换”和思路参考，而不是完全替代人工代码审查，因此生成结果仍建议开发者再检查一遍。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>为什么转换结果不能直接运行？<br /><strong>A：</strong>因为 Java 和 Node.js 语法与运行时模型差异较大，复杂代码通常仍需要人工调整。</p>
+            <p><strong>Q：</strong>适合什么用途？<br /><strong>A：</strong>适合快速改写思路、代码迁移参考、教学演示和原型验证。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="java-to-node" />
     </ToolLayout>
   );

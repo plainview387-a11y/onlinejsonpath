@@ -77,6 +77,27 @@ export default function TextStatsPage() {
       </div>
 
       {/* 评论区 */}
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>文本统计工具适合写作、排版、内容审核和开发场景下的快速字数计算，可以实时统计字符数、空格数、行数和段落数。</p>
+            <p>相比手工复制到第三方编辑器，这个页面更适合你在当前工作流里快速判断文本长度和结构。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>字数和字符数为什么不一样？<br /><strong>A：</strong>字符数会把空格、换行等也统计进去，而字数更接近按词或内容单位计算。</p>
+            <p><strong>Q：</strong>空行会算段落吗？<br /><strong>A：</strong>当前是按非空内容段落统计，纯空行不会单独算作段落。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="text-stats" />
     </ToolLayout>
   );
