@@ -25,7 +25,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { authFetch, readStoredUser } from '@/lib/auth-client';
+import { authFetch } from '@/lib/auth-client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Comment {
   id: string;
@@ -290,6 +291,7 @@ function CommentItem({
 }
 
 export function CommentSection({ pageKey }: CommentSectionProps) {
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -300,7 +302,6 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [user, setUser] = useState<{ id: string; nickname: string; avatar: string } | null>(null);
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('hot');
@@ -308,10 +309,6 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    setUser(readStoredUser());
-  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem(getLocalLikesKey(pageKey));
