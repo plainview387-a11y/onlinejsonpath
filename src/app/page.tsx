@@ -153,23 +153,23 @@ export default function HomePage() {
       </div>
 
       {/* 主推工具 */}
-      <div className="grid grid-cols-1 items-start gap-4 mb-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <Link href="/tools/jsonpath" className="self-start">
+      <div className="mb-8 space-y-4">
+        <Link href="/tools/jsonpath" className="block">
           <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-blue-50 via-background to-cyan-50 hover:shadow-lg transition-all cursor-pointer group">
             <CardContent className="p-5 md:p-6 lg:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                     <Braces className="h-3.5 w-3.5" />
                     主推工具
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight group-hover:text-primary transition-colors">
+                  <h2 className="text-2xl font-bold tracking-tight transition-colors group-hover:text-primary md:text-3xl">
                     在线 JSONPath 解析工具
                   </h2>
-                  <p className="text-muted-foreground mt-3 leading-7">
+                  <p className="mt-3 leading-7 text-muted-foreground">
                     直接粘贴 JSON，输入 JSONPath 表达式，即可查看解析结果。适合接口调试、字段定位、测试联调和日常开发排查。
                   </p>
-                  <div className="flex flex-wrap gap-2 mt-5">
+                  <div className="mt-5 flex flex-wrap gap-2">
                     {['默认示例', '语法参考', '结果复制', '在线解析'].map((tag) => (
                       <span key={tag} className="rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
                         {tag}
@@ -177,7 +177,7 @@ export default function HomePage() {
                     ))}
                   </div>
                 </div>
-                <div className="hidden md:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                <div className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm md:flex">
                   <Braces className="h-7 w-7" />
                 </div>
               </div>
@@ -185,21 +185,26 @@ export default function HomePage() {
           </Card>
         </Link>
 
-        <Card className="self-start border-dashed">
+        <Card className="border-dashed">
           <CardContent className="p-5 md:p-6">
-            <h3 className="font-semibold text-lg">快速入口</h3>
-            <p className="mt-2 text-sm text-muted-foreground">如果你是第一次来，建议优先体验这些高频工具。</p>
-            <div className="mt-4 space-y-3">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">快速入口</h3>
+                <p className="mt-1 text-sm text-muted-foreground">如果你是第一次来，建议优先体验这些高频工具。</p>
+              </div>
+              <span className="text-xs text-muted-foreground">精选 3 个高频工具</span>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
               {tools.slice(0, 3).map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <Link key={tool.href} href={tool.href} className="flex items-center gap-3 rounded-xl border p-3 hover:bg-muted/50 transition-colors">
-                    <div className={`p-2 rounded-lg ${tool.bgColor}`}>
+                  <Link key={tool.href} href={tool.href} className="flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50">
+                    <div className={`rounded-lg p-2 ${tool.bgColor}`}>
                       <Icon className={`h-4 w-4 ${tool.color}`} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium">{tool.title}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{tool.description}</p>
+                      <p className="line-clamp-1 text-xs text-muted-foreground">{tool.description}</p>
                     </div>
                   </Link>
                 );
