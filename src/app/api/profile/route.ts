@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
-import { generateAvatarForSeed, generateToken, hashPassword, verifyPassword, verifyToken } from '@/lib/auth';
+import { generateToken, hashPassword, verifyPassword, verifyToken } from '@/lib/auth';
+import { pickNextAvatar } from '@/lib/avatar-presets';
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -46,7 +47,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (!avatar && body.regenerateAvatar === true) {
-      updates.avatar = generateAvatarForSeed(`${existingUser.email}-${Date.now()}`);
+      updates.avatar = pickNextAvatar(existingUser.avatar);
     }
 
     if (newPassword) {
