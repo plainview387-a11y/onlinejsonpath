@@ -9,6 +9,7 @@ export interface User {
   nickname: string;
   avatar: string;
   createdAt: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -63,7 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: data.user.email,
             nickname: data.user.nickname || savedUser.nickname,
             avatar: data.user.avatar || savedUser.avatar,
-            createdAt: savedUser.createdAt || new Date().toISOString(),
+            createdAt: data.user.createdAt || savedUser.createdAt || new Date().toISOString(),
+            isAdmin: !!data.user.isAdmin,
           };
           localStorage.setItem('user', JSON.stringify(verifiedUser));
           startTransition(() => {

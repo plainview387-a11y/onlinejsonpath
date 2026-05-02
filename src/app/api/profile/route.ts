@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import { generateToken, hashPassword, verifyPassword, verifyToken } from '@/lib/auth';
 import { pickNextAvatar } from '@/lib/avatar-presets';
+import { isAdminEmail } from '@/lib/admin';
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -94,6 +95,7 @@ export async function PATCH(request: NextRequest) {
         nickname: updatedUser.nickname,
         avatar: updatedUser.avatar || '',
         createdAt: updatedUser.created_at,
+        isAdmin: isAdminEmail(updatedUser.email),
       },
     });
   } catch (error) {

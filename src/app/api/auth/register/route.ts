@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import { hashPassword, generateRandomAvatar, generateLocalUser, generateToken } from '@/lib/auth';
 import { verifyCaptcha } from '@/lib/captcha';
+import { isAdminEmail } from '@/lib/admin';
 
 function isSupabaseConfigError(error: unknown): boolean {
   return error instanceof Error && error.message.includes('Supabase');
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
         nickname: user.nickname,
         avatar: user.avatar,
         createdAt: user.created_at,
+        isAdmin: isAdminEmail(user.email),
       },
     });
   } catch (error) {

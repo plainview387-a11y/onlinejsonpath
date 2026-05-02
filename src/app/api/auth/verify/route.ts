@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { isAdminEmail } from '@/lib/admin';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest) {
             nickname: user.nickname,
             avatar: user.avatar,
             createdAt: user.created_at,
+            isAdmin: isAdminEmail(user.email),
           },
         });
       }
@@ -49,7 +51,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      user: decoded,
+      user: {
+        ...decoded,
+        isAdmin: isAdminEmail(decoded.email),
+      },
     });
   } catch (error) {
     console.error('Verify token error:', error);

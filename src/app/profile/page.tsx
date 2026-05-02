@@ -79,15 +79,25 @@ export default function ProfilePage() {
                 修改密码
               </Button>
             </Link>
-            <div className="rounded-xl border bg-muted/30 p-4 text-sm leading-7 text-muted-foreground">
-              后续如果你有管理员权限，站点统计和注册用户列表会放到单独的管理入口，而不是默认暴露在个人中心里。
-            </div>
-            <Link href="/admin/stats">
-              <Button variant="ghost" className="w-full justify-start text-muted-foreground">
-                <Shield className="mr-2 h-4 w-4" />
-                管理统计入口（需管理员权限）
-              </Button>
-            </Link>
+            {user.isAdmin ? (
+              <div className="space-y-3 rounded-xl border bg-muted/30 p-4 text-sm leading-7 text-muted-foreground">
+                <p>管理员账号可查看站点统计与注册用户列表，普通用户不会看到后台入口。</p>
+                <div className="flex flex-col gap-2">
+                  <Link href="/admin/stats">
+                    <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                      <Shield className="mr-2 h-4 w-4" />
+                      管理统计
+                    </Button>
+                  </Link>
+                  <Link href="/admin/users">
+                    <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                      <Shield className="mr-2 h-4 w-4" />
+                      注册用户管理
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>
