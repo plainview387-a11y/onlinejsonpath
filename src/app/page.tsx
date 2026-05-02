@@ -185,12 +185,12 @@ export default function HomePage() {
           </Card>
         </Link>
 
-        <Card className="border-dashed">
-          <CardContent className="p-6">
+        <Card className="self-start border-dashed">
+          <CardContent className="p-5 md:p-6">
             <h3 className="font-semibold text-lg">快速入口</h3>
-            <p className="text-sm text-muted-foreground mt-2">如果你是第一次来，建议优先体验这些高频工具。</p>
-            <div className="mt-5 space-y-3">
-              {tools.slice(0, 4).map((tool) => {
+            <p className="mt-2 text-sm text-muted-foreground">如果你是第一次来，建议优先体验这些高频工具。</p>
+            <div className="mt-4 space-y-3">
+              {tools.slice(0, 3).map((tool) => {
                 const Icon = tool.icon;
                 return (
                   <Link key={tool.href} href={tool.href} className="flex items-center gap-3 rounded-xl border p-3 hover:bg-muted/50 transition-colors">
