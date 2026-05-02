@@ -5,6 +5,7 @@ set -Eeuo pipefail
 PORT=5000
 COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
 DEPLOY_RUN_PORT=5000
+PNPM_CMD="${PNPM_CMD:-corepack pnpm}"
 
 
 cd "${COZE_WORKSPACE_PATH}"
@@ -31,4 +32,4 @@ echo "Clearing port ${PORT} before start."
 kill_port_if_listening
 echo "Starting HTTP service on port ${PORT} for dev..."
 
-cd /workspace/projects && PORT=$PORT NEXT_DISABLE_TURBOPACK=1 pnpm next dev -p $PORT
+cd /workspace/projects && PORT=$PORT NEXT_DISABLE_TURBOPACK=1 ${PNPM_CMD} next dev -p $PORT

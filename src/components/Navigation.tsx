@@ -24,6 +24,7 @@ import {
   FileText,
   Image,
   Globe,
+  BriefcaseBusiness,
 } from 'lucide-react';
 
 const tools = [
@@ -62,6 +63,18 @@ export function Navigation() {
             }`}
           >
             首页
+          </Link>
+
+          <Link
+            href="/projects/ai-project"
+            className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+              pathname.startsWith('/projects/ai-project') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+            }`}
+          >
+            <span className="inline-flex items-center gap-1">
+              <BriefcaseBusiness className="h-4 w-4" />
+              AIProject
+            </span>
           </Link>
 
           <DropdownMenu>
