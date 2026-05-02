@@ -203,8 +203,8 @@ function SectionHeading({
 export default function AIProjectPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-      <section className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-10 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-14">
-        <div className="flex flex-col pt-6 md:pt-10">
+      <section className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 md:px-8 md:py-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+        <div className="flex flex-col pt-4 md:pt-6 lg:pt-10">
           <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-sm">
             作品集 / 在线简历 / 项目展示页
           </Badge>
@@ -214,20 +214,20 @@ export default function AIProjectPage() {
           <p className="mt-4 text-xl font-medium text-primary md:text-2xl">{profile.role}</p>
           <p className="mt-6 max-w-2xl text-lg leading-9 text-muted-foreground">{profile.tagline}</p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="rounded-full">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button asChild size="lg" className="w-full rounded-full sm:w-auto">
               <a href="#projects">
                 <BriefcaseBusiness className="mr-2 h-4 w-4" />
                 看项目
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full">
+            <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
               <a href={profile.resumeUrl}>
                 <Download className="mr-2 h-4 w-4" />
                 看简历
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full">
+            <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
               <a href="#contact">
                 <Mail className="mr-2 h-4 w-4" />
                 联系我
@@ -253,7 +253,7 @@ export default function AIProjectPage() {
 
         <Card className="relative overflow-hidden border-primary/20 shadow-sm">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_26%),radial-gradient(circle_at_80%_20%,rgba(34,197,94,0.12),transparent_22%),linear-gradient(135deg,rgba(255,255,255,1)_0%,rgba(248,250,252,1)_42%,rgba(239,246,255,1)_100%)]" />
-          <CardContent className="relative p-6 md:p-8">
+          <CardContent className="relative p-5 sm:p-6 md:p-8">
             <div className="flex items-center justify-between gap-4">
               <Badge variant="outline" className="rounded-full bg-background/80">
                 Young / Clear / Product-minded
@@ -279,7 +279,7 @@ export default function AIProjectPage() {
                 </CardContent>
               </Card>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 lg:grid-cols-2">
                 <Card>
                   <CardContent className="p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">我常做的方向</p>
@@ -318,7 +318,7 @@ export default function AIProjectPage() {
         </Card>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 px-4 md:grid-cols-3 md:px-8">
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 md:px-8 lg:grid-cols-3">
         {highlights.map((item) => {
           const Icon = item.icon;
           return (
@@ -465,7 +465,7 @@ export default function AIProjectPage() {
             title="一些思考和记录"
             description="项目展示的是结果，文章更适合表达我怎么理解问题、怎么判断方案。"
           />
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {posts.map((post) => (
               <Card key={post.title} className="shadow-sm">
                 <CardContent className="p-6">
@@ -485,7 +485,7 @@ export default function AIProjectPage() {
         </div>
       </section>
 
-      <section id="resume" className="mx-auto grid max-w-7xl gap-8 px-4 py-20 md:grid-cols-[0.85fr_1.15fr] md:px-8">
+      <section id="resume" className="mx-auto grid max-w-7xl gap-8 px-4 py-20 md:px-8 lg:grid-cols-[0.85fr_1.15fr]">
         <div>
           <SectionHeading
             eyebrow="Resume"
@@ -533,7 +533,7 @@ export default function AIProjectPage() {
       <section id="contact" className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
         <Card className="overflow-hidden bg-primary text-primary-foreground shadow-sm">
           <CardContent className="p-6 md:p-8">
-            <div className="grid gap-8 md:grid-cols-[0.82fr_1.18fr]">
+            <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">Contact</p>
                 <h2 className="mt-3 text-3xl font-semibold">如果你也在做系统或工具类项目，欢迎联系我</h2>
