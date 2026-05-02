@@ -134,6 +134,27 @@ export default function Base64Page() {
         </div>
       </div>
 
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>Base64 常用于接口传输、图片内联、签名串处理和调试排查。这个页面支持文本内容的在线编码与解码。</p>
+            <p>如果输入的内容不是合法 Base64，页面会直接给出错误提示，避免误把无效内容当成结果继续使用。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>Base64 是加密吗？<br /><strong>A：</strong>不是，它只是编码方式，不能代替真正的加密。</p>
+            <p><strong>Q：</strong>为什么解码失败？<br /><strong>A：</strong>通常是输入内容不完整、夹带空白字符，或者本身就不是合法 Base64。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <CommentSection pageKey="base64" />
     </ToolLayout>
   );

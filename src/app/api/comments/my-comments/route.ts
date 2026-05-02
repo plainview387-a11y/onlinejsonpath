@@ -98,8 +98,27 @@ export async function GET(request: NextRequest) {
       'ip-query': 'IP 查询',
     };
 
+    const commentList = (comments as UserCommentRecord[] | null) || [];
+    const topLevelIds = commentList.filter((comment) => !comment.parent_id).map((comment) => comment.id);
+
+    let replyCounts = new Map<string, number>();
+    if (topLevelIds.length > 0) {
+      const { data: childComments } = await client
+        .from('comments')
+        .select('parent_id')
+        .in('parent_id', topLevelIds);
+
+      replyCounts = new Map(
+        (childComments || []).reduce((acc, item) => {
+          if (!item.parent_id) return acc;
+          acc.set(item.parent_id, (acc.get(item.parent_id) || 0) + 1);
+          return acc;
+        }, new Map<string, number>())
+      );
+    }
+
     // 格式化返回数据
-    const formattedComments = (comments as UserCommentRecord[] | null)?.map((comment) => ({
+    const formattedComments = commentList.map((comment) => ({
       id: comment.id,
       content: comment.content,
       createdAt: comment.created_at,
@@ -107,7 +126,8 @@ export async function GET(request: NextRequest) {
       pageKey: comment.page_key,
       pageName: pageNames[comment.page_key] || comment.page_key,
       isReply: !!comment.parent_id,
-    })) || [];
+      canDelete: comment.parent_id ? true : (replyCounts.get(comment.id) || 0) === 0,
+    }));
 
     return NextResponse.json({
       success: true,

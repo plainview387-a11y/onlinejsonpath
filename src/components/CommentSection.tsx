@@ -63,6 +63,7 @@ interface HistoryComment {
   pageKey: string;
   pageName: string;
   isReply: boolean;
+  canDelete?: boolean;
 }
 
 const MAX_COMMENT_LENGTH = 500;
@@ -134,6 +135,32 @@ function HistoryModal({
     }
   }, [pagination.pageSize]);
 
+  const handleDeleteHistoryComment = async (comment: HistoryComment) => {
+    if (!comment.canDelete) {
+      toast.error('该评论当前不可删除');
+      return;
+    }
+
+    const confirmed = window.confirm('确认删除这条评论吗？');
+    if (!confirmed) return;
+
+    try {
+      const res = await authFetch(`/api/comments?id=${encodeURIComponent(comment.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success('评论已删除');
+        fetchMyComments(pagination.page);
+      } else {
+        toast.error(data.error || '删除评论失败');
+      }
+    } catch {
+      toast.error('网络错误');
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchMyComments(1);
@@ -177,6 +204,21 @@ function HistoryModal({
                     <span>{formatTime(comment.createdAt)}</span>
                   </div>
                   <p className="break-words text-sm leading-6 whitespace-pre-wrap">{comment.content}</p>
+                  <div className="mt-3 flex items-center gap-2">
+                    {comment.canDelete ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 rounded-full px-3 text-xs"
+                        onClick={() => handleDeleteHistoryComment(comment)}
+                      >
+                        <Trash2 className="mr-1 h-3.5 w-3.5" />
+                        删除
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">有回复的主评论暂不支持删除</span>
+                    )}
+                  </div>
                 </div>
               ))}
 

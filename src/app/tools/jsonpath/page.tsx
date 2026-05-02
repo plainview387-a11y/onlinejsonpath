@@ -386,6 +386,27 @@ export default function JsonPathPage() {
         </Card>
       </div>
 
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>JSONPath 适合从复杂 JSON 结构中快速定位字段、提取数组内容和做接口联调排查。这个工具支持在线输入 JSON、编写表达式并即时查看结果。</p>
+            <p>你可以直接使用页面内置示例，也可以把接口返回值粘贴进来，结合常用语法表快速验证表达式写法。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>为什么表达式没有结果？<br /><strong>A：</strong>通常是路径写错、字段名不匹配，或者当前 JSON 结构与预期不一致。</p>
+            <p><strong>Q：</strong>适合什么场景？<br /><strong>A：</strong>接口联调、日志排查、Mock 数据验证、复杂 JSON 提取和自动化测试场景都很适合。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* 评论区 */}
       <CommentSection pageKey="jsonpath" />
     </div>

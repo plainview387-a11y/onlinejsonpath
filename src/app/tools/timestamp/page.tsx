@@ -181,6 +181,27 @@ export default function TimestampPage() {
         </div>
       </div>
 
+      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">工具说明</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p>这个工具适合开发调试、日志排查和接口联调时快速完成 Unix 时间戳与日期时间的双向转换。</p>
+            <p>页面支持秒级与毫秒级切换，也支持直接使用当前时间，减少手动复制和换算成本。</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">常见问题</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <p><strong>Q：</strong>为什么会差 8 小时？<br /><strong>A：</strong>通常是本地时间和 UTC 时间理解不一致，建议确认时区和输入格式。</p>
+            <p><strong>Q：</strong>秒级和毫秒级怎么区分？<br /><strong>A：</strong>10 位通常是秒级，13 位通常是毫秒级。</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* 评论区 */}
       <CommentSection pageKey="timestamp" />
     </ToolLayout>
