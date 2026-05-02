@@ -153,7 +153,7 @@ export default function HomePage() {
       </div>
 
       {/* 主推工具 */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 mb-8">
+      <div className="grid grid-cols-1 items-start gap-4 mb-8 lg:grid-cols-[1.2fr_0.8fr]">
         <Link href="/tools/jsonpath">
           <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-blue-50 via-background to-cyan-50 hover:shadow-lg transition-all cursor-pointer group">
             <CardContent className="p-6 md:p-8">
