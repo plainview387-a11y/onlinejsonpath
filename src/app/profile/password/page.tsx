@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { BackButton } from '@/components/BackButton';
 import { toast } from 'sonner';
 
 export default function ProfilePasswordPage() {
@@ -48,27 +49,34 @@ export default function ProfilePasswordPage() {
   if (isLoading || !user) return <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">加载中...</div>;
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>修改密码</CardTitle>
-          <CardDescription>为了安全起见，需要先输入当前密码，再设置新密码。</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">当前密码</Label>
-            <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">新密码</Label>
-            <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="至少 6 位" />
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => router.push('/profile')}>返回个人中心</Button>
-            <Button disabled={saving} onClick={handleSave}>{saving ? '保存中...' : '确认修改'}</Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background via-background to-muted/20">
+      <div className="container mx-auto max-w-3xl px-4 py-8">
+        <Card className="shadow-sm">
+          <CardHeader className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <CardTitle>修改密码</CardTitle>
+                <CardDescription>为了安全起见，需要先输入当前密码，再设置新密码。</CardDescription>
+              </div>
+              <BackButton fallbackHref="/profile" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">当前密码</Label>
+              <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">新密码</Label>
+              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="至少 6 位" />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => router.push('/profile')}>取消</Button>
+              <Button disabled={saving} onClick={handleSave}>{saving ? '保存中...' : '确认修改'}</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

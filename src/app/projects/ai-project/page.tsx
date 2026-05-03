@@ -298,9 +298,9 @@ export default function AIProjectPage() {
                   <CardContent className="p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">我重视的特性</p>
                     <ul className="mt-4 space-y-3 text-sm">
-                      <li>• 页面一看就知道怎么用</li>
-                      <li>• 流程清楚，不靠人反复提醒</li>
-                      <li>• 数据可追踪，系统可维护</li>
+                      <li>• 交互清晰，功能路径明确</li>
+                      <li>• 系统稳定，便于长期维护</li>
+                      <li>• 配合业务流程，强调落地</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -464,7 +464,7 @@ export default function AIProjectPage() {
           <SectionHeading
             eyebrow="Writing"
             title="补充说明"
-            description="这里保留一些补充信息，用于说明我更关注的问题类型和做事方式。"
+            description="以下内容用于补充说明我关注的问题类型、做事方式和项目判断标准。"
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {posts.map((post) => (
