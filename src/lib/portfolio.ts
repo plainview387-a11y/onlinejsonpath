@@ -1,17 +1,17 @@
 export const profile = {
-  name: '牛晓龙',
+  name: '候选人',
   role: '前端开发 / 全栈开发',
   location: '上海',
   tagline:
     '专注前端开发、后台管理系统和小程序实现，重视交互清晰度、系统稳定性与长期维护性。',
   intro:
     '我更关注面向真实业务场景的系统建设，包括后台管理系统、小程序、门户和数据展示类产品。相比单纯完成页面，我更在意功能是否顺手、结构是否清楚、上线后是否稳定，以及后续是否易于维护和继续扩展。',
-  email: '2719263509@qq.com',
-  phone: '18155884720',
+  email: '',
+  phone: '',
   school: '池州学院',
   major: '数据科学与大数据技术',
-  resumeUrl: '/牛晓龙-2024ss-简历.pdf',
-  avatarInitials: 'NX',
-  status: '可交流前端 / 全栈相关机会',
-  availability: '期望工作地点上海，方向偏前端开发、系统实现与业务工具建设',
+  resumeUrl: '',
+  avatarInitials: 'PR',
+  status: '公开展示版，个人联系方式与简历暂不对外展示',
+  availability: '如需进一步沟通或获取完整简历，请通过私下渠道联系',
 };

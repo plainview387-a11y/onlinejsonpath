@@ -14,7 +14,6 @@ import {
   Code2,
   Database,
   Compass,
-  Phone,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -143,8 +142,6 @@ const resumeSections = [
   {
     title: '基本信息',
     items: [
-      `电话：${profile.phone}`,
-      `邮箱：${profile.email}`,
       `毕业院校：${profile.school}`,
       `专业：${profile.major}`,
     ],
@@ -168,9 +165,8 @@ const resumeSections = [
 ];
 
 const contactLinks = [
-  { label: '邮箱', value: profile.email, href: `mailto:${profile.email}`, icon: Mail },
-  { label: '电话', value: profile.phone, href: `tel:${profile.phone}`, icon: Phone },
   { label: '所在地', value: profile.location, href: '#', icon: MapPin },
+  { label: '联系说明', value: '联系方式与完整简历按需提供', href: '#', icon: Mail },
 ];
 
 function SectionHeading({
@@ -200,7 +196,7 @@ export default function AIProjectPage() {
             在线简历 / 项目作品 / 求职展示
           </Badge>
           <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
-            你好，我是 {profile.name}
+            你好，这里是我的项目与能力展示
           </h1>
           <p className="mt-4 text-xl font-medium text-primary md:text-2xl">{profile.role}</p>
           <p className="mt-6 max-w-2xl text-lg leading-9 text-muted-foreground">{profile.tagline}</p>
@@ -213,15 +209,15 @@ export default function AIProjectPage() {
               </a>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
-              <a href={profile.resumeUrl}>
+              <span>
                 <Download className="mr-2 h-4 w-4" />
-                下载简历
-              </a>
+                简历暂不公开
+              </span>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
               <a href="#contact">
                 <Mail className="mr-2 h-4 w-4" />
-                联系我
+                联系方式说明
               </a>
             </Button>
           </div>
@@ -498,9 +494,7 @@ export default function AIProjectPage() {
                 <h3 className="text-2xl font-semibold">{profile.name}</h3>
                 <p className="mt-2 text-muted-foreground">{profile.role}</p>
               </div>
-              <a className="text-sm font-semibold text-primary" href={`mailto:${profile.email}`}>
-                {profile.email}
-              </a>
+              <span className="text-sm font-semibold text-primary">联系方式按需提供</span>
             </div>
             <div className="mt-6 grid gap-5">
               {resumeSections.map((section) => (
@@ -527,7 +521,7 @@ export default function AIProjectPage() {
             <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">Contact</p>
-                <h2 className="mt-3 text-3xl font-semibold">如果你正在寻找偏系统实现和业务落地的前端 / 全栈同学，欢迎联系我</h2>
+                <h2 className="mt-3 text-3xl font-semibold">如果你正在寻找偏系统实现和业务落地的前端 / 全栈同学，这里可以先看项目与能力概览</h2>
                 <p className="mt-4 leading-8 text-primary-foreground/80">
                   我更希望参与有明确业务目标、重视执行质量和长期迭代的项目或岗位。
                 </p>
@@ -573,17 +567,13 @@ export default function AIProjectPage() {
                     <ArrowUpRight className="h-4 w-4" />
                   </span>
                 </Link>
-                <a
-                  href={profile.resumeUrl}
-                  className="rounded-[24px] border border-white/15 bg-white/10 p-4 transition hover:bg-white/15"
-                >
+                <div className="rounded-[24px] border border-white/15 bg-white/10 p-4">
                   <Download className="h-5 w-5" />
                   <span className="mt-4 block text-sm text-primary-foreground/70">PDF 简历</span>
                   <span className="mt-1 flex items-center gap-2 font-semibold">
-                    下载附件
-                    <ArrowUpRight className="h-4 w-4" />
+                    暂不公开
                   </span>
-                </a>
+                </div>
               </div>
             </div>
           </CardContent>
