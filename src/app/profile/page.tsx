@@ -95,6 +95,12 @@ export default function ProfilePage() {
                       注册用户管理
                     </Button>
                   </Link>
+                  <Link href="/admin/comments">
+                    <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                      <Shield className="mr-2 h-4 w-4" />
+                      评论管理
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ) : null}

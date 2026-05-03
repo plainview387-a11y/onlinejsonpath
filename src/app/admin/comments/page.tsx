@@ -8,6 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { ChevronLeft, ChevronRight, Loader2, Shield, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AdminComment {
@@ -21,6 +32,13 @@ interface AdminComment {
   user: { id: string; email: string; nickname: string; avatar: string };
 }
 
+interface Pagination {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
 export default function AdminCommentsPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -28,17 +46,28 @@ export default function AdminCommentsPage() {
   const [query, setQuery] = useState('');
   const [pageKey, setPageKey] = useState('');
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    pageSize: 20,
+    total: 0,
+    totalPages: 0,
+  });
+  const [pendingDelete, setPendingDelete] = useState<AdminComment | null>(null);
 
-  const loadComments = useCallback(async () => {
+  const loadComments = useCallback(async (targetPage = pagination.page, targetPageSize = pagination.pageSize) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (query.trim()) params.set('query', query.trim());
       if (pageKey.trim()) params.set('pageKey', pageKey.trim());
+      params.set('page', String(targetPage));
+      params.set('pageSize', String(targetPageSize));
+
       const res = await authFetch(`/api/admin/comments?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setComments(data.data.comments || []);
+        setPagination(data.data.pagination);
       } else {
         toast.error(data.error || '无权限访问');
         router.push('/profile');
@@ -48,57 +77,167 @@ export default function AdminCommentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [pageKey, query, router]);
+  }, [pageKey, pagination.page, pagination.pageSize, query, router]);
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/login');
   }, [user, isLoading, router]);
 
   useEffect(() => {
-    if (user) loadComments();
-  }, [user, loadComments]);
+    if (user) loadComments(1, pagination.pageSize);
+  }, [user, loadComments, pagination.pageSize]);
 
-  if (isLoading || loading) return <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">加载中...</div>;
+  const handleSearch = () => loadComments(1, pagination.pageSize);
+
+  const clearFilters = () => {
+    setQuery('');
+    setPageKey('');
+    setTimeout(() => loadComments(1, pagination.pageSize), 0);
+  };
+
+  const changePageSize = (nextPageSize: number) => {
+    setPagination((prev) => ({ ...prev, pageSize: nextPageSize }));
+    loadComments(1, nextPageSize);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    try {
+      const res = await authFetch(`/api/admin/comments?id=${encodeURIComponent(pendingDelete.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('评论已删除');
+        setPendingDelete(null);
+        loadComments(pagination.page, pagination.pageSize);
+      } else {
+        toast.error(data.error || '删除评论失败');
+      }
+    } catch {
+      toast.error('网络错误');
+    }
+  };
+
+  if (isLoading || loading) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        加载中...
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">评论管理</h1>
-          <p className="text-sm text-muted-foreground">查看全站评论，后续这里会继续接删除与逻辑删除能力。</p>
+    <>
+      <div className="container mx-auto max-w-6xl px-4 py-8">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">评论管理</h1>
+            <p className="text-sm text-muted-foreground">查看全站评论、按页面筛选、按关键词搜索，并支持管理员删除。</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => router.push('/admin/stats')}>
+              <Shield className="mr-2 h-4 w-4" />
+              统计
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/admin/users')}>
+              <Shield className="mr-2 h-4 w-4" />
+              用户
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push('/admin/stats')}>统计</Button>
-          <Button variant="outline" onClick={() => router.push('/admin/users')}>用户</Button>
-        </div>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>筛选与分页</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-[1fr_220px_140px_auto_auto]">
+              <Input placeholder="搜索评论内容..." value={query} onChange={(e) => setQuery(e.target.value)} />
+              <Input placeholder="按页面标识筛选，如 jsonpath" value={pageKey} onChange={(e) => setPageKey(e.target.value)} />
+              <select
+                className="h-10 rounded-md border bg-background px-3 text-sm"
+                value={pagination.pageSize}
+                onChange={(e) => changePageSize(Number(e.target.value))}
+              >
+                {[10, 20, 50, 100].map((size) => (
+                  <option key={size} value={size}>{size} / 页</option>
+                ))}
+              </select>
+              <Button onClick={handleSearch}>查询</Button>
+              <Button variant="ghost" onClick={clearFilters}>清空</Button>
+            </div>
+            <div className="text-xs text-muted-foreground">共 {pagination.total} 条评论，当前第 {pagination.page} / {Math.max(pagination.totalPages, 1)} 页</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>评论列表</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {comments.map((item) => (
+              <div key={item.id} className="rounded-xl border p-4">
+                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <Badge variant="secondary">{item.pageKey}</Badge>
+                  {item.isReply && <Badge variant="outline">回复</Badge>}
+                  <span>{new Date(item.createdAt).toLocaleString('zh-CN')}</span>
+                </div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="text-sm font-medium">{item.user.nickname} · {item.user.email || '无邮箱'}</div>
+                  <Button variant="outline" size="sm" onClick={() => setPendingDelete(item)}>
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    删除
+                  </Button>
+                </div>
+                <p className="whitespace-pre-wrap text-sm leading-7">{item.content}</p>
+              </div>
+            ))}
+
+            {comments.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">暂无符合条件的评论</p>}
+
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => loadComments(pagination.page - 1, pagination.pageSize)}
+                  disabled={pagination.page <= 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="min-w-20 text-center text-sm text-muted-foreground">
+                  {pagination.page} / {pagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => loadComments(pagination.page + 1, pagination.pageSize)}
+                  disabled={pagination.page >= pagination.totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader><CardTitle>筛选</CardTitle></CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
-          <Input placeholder="搜索评论内容..." value={query} onChange={(e) => setQuery(e.target.value)} />
-          <Input placeholder="按页面标识筛选，如 jsonpath" value={pageKey} onChange={(e) => setPageKey(e.target.value)} />
-          <Button onClick={loadComments}>查询</Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle>评论列表</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          {comments.map((item) => (
-            <div key={item.id} className="rounded-xl border p-4">
-              <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <Badge variant="secondary">{item.pageKey}</Badge>
-                {item.isReply && <Badge variant="outline">回复</Badge>}
-                <span>{new Date(item.createdAt).toLocaleString('zh-CN')}</span>
-              </div>
-              <div className="mb-2 text-sm font-medium">{item.user.nickname} · {item.user.email}</div>
-              <p className="whitespace-pre-wrap text-sm leading-7">{item.content}</p>
-            </div>
-          ))}
-          {comments.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">暂无符合条件的评论</p>}
-        </CardContent>
-      </Card>
-    </div>
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除这条评论？</AlertDialogTitle>
+            <AlertDialogDescription>
+              管理员删除同样遵循当前限制：如果主评论下还有回复，系统会拒绝直接删除。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>确认删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
