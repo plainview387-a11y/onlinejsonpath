@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,7 @@ export default function LoginPage() {
     register: language === 'zh' ? '立即注册' : 'Register now',
   };
 
-  const fetchCaptcha = async () => {
+  const fetchCaptcha = useCallback(async () => {
     setCaptchaLoading(true);
     try {
       const response = await fetch('/api/captcha');
@@ -60,11 +60,11 @@ export default function LoginPage() {
     } finally {
       setCaptchaLoading(false);
     }
-  };
+  }, [language]);
 
   useEffect(() => {
     fetchCaptcha();
-  }, []);
+  }, [fetchCaptcha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

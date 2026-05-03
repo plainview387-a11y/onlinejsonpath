@@ -35,7 +35,7 @@ function getDefaultJsonPathResult() {
 
 export default function JsonPathPage() {
   const { language } = useLanguage();
-  const syntaxExamples = [
+  const syntaxExamples = useMemo(() => [
     { symbol: '$', description: language === 'zh' ? '根对象' : 'Root object', example: '$', resultDescription: language === 'zh' ? '整个JSON对象' : 'Entire JSON object' },
     { symbol: '.', description: language === 'zh' ? '子节点' : 'Child node', example: '$.store.book', resultDescription: language === 'zh' ? 'book数组' : 'book array' },
     { symbol: '..', description: language === 'zh' ? '递归查找' : 'Recursive search', example: '$..author', resultDescription: language === 'zh' ? '所有author字段' : 'All author fields' },
@@ -44,7 +44,7 @@ export default function JsonPathPage() {
     { symbol: '[-1]', description: language === 'zh' ? '最后一个元素' : 'Last element', example: '$.store.book[-1]', resultDescription: language === 'zh' ? '最后一本书' : 'Last book' },
     { symbol: '[n:m]', description: language === 'zh' ? '数组切片' : 'Array slice', example: '$.store.book[0:2]', resultDescription: language === 'zh' ? '前两本书' : 'First two books' },
     { symbol: '[?()]', description: language === 'zh' ? '过滤表达式' : 'Filter expression', example: '$.store.book[?(@.price<10)]', resultDescription: language === 'zh' ? '价格小于10的书' : 'Books priced under 10' },
-  ];
+  ], [language]);
 
   const copy = {
     title: language === 'zh' ? 'JSONPath 解析工具' : 'JSONPath Tool',
