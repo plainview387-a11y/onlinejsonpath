@@ -50,12 +50,12 @@ export default function AdminCommentsPage() {
   const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 20, total: 0, totalPages: 0 });
   const [pendingDelete, setPendingDelete] = useState<AdminComment | null>(null);
 
-  const loadComments = useCallback(async (targetPage = pagination.page, targetPageSize = pagination.pageSize) => {
+  const loadComments = useCallback(async (targetPage = pagination.page, targetPageSize = pagination.pageSize, nextQuery = query, nextPageKey = pageKey) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (query.trim()) params.set('query', query.trim());
-      if (pageKey.trim()) params.set('pageKey', pageKey.trim());
+      if (nextQuery.trim()) params.set('query', nextQuery.trim());
+      if (nextPageKey.trim()) params.set('pageKey', nextPageKey.trim());
       params.set('page', String(targetPage));
       params.set('pageSize', String(targetPageSize));
 
@@ -80,18 +80,23 @@ export default function AdminCommentsPage() {
   }, [user, isLoading, router]);
 
   useEffect(() => {
-    if (user) loadComments(1, pagination.pageSize);
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('query') || '';
+    const initialPageKey = params.get('pageKey') || '';
+    setQuery(initialQuery);
+    setPageKey(initialPageKey);
+    if (user) loadComments(1, pagination.pageSize, initialQuery, initialPageKey);
   }, [user, loadComments, pagination.pageSize]);
 
-  const handleSearch = () => loadComments(1, pagination.pageSize);
+  const handleSearch = () => loadComments(1, pagination.pageSize, query, pageKey);
   const clearFilters = () => {
     setQuery('');
     setPageKey('');
-    setTimeout(() => loadComments(1, pagination.pageSize), 0);
+    setTimeout(() => loadComments(1, pagination.pageSize, '', ''), 0);
   };
   const changePageSize = (nextPageSize: number) => {
     setPagination((prev) => ({ ...prev, pageSize: nextPageSize }));
-    loadComments(1, nextPageSize);
+    loadComments(1, nextPageSize, query, pageKey);
   };
 
   const confirmDelete = async () => {
@@ -102,7 +107,7 @@ export default function AdminCommentsPage() {
       if (data.success) {
         toast.success('评论已删除');
         setPendingDelete(null);
-        loadComments(pagination.page, pagination.pageSize);
+        loadComments(pagination.page, pagination.pageSize, query, pageKey);
       } else {
         toast.error(data.error || '删除评论失败');
       }
@@ -129,7 +134,10 @@ export default function AdminCommentsPage() {
               <Button onClick={handleSearch}>查询</Button>
               <Button variant="ghost" onClick={clearFilters}>清空</Button>
             </div>
-            <div className="text-xs text-muted-foreground">共 {pagination.total} 条评论，当前第 {pagination.page} / {Math.max(pagination.totalPages, 1)} 页</div>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>共 {pagination.total} 条评论，当前第 {pagination.page} / {Math.max(pagination.totalPages, 1)} 页</span>
+              {pageKey ? <Badge variant="secondary">当前筛选：{pageKey}</Badge> : null}
+            </div>
           </div>
         </AdminToolbar>
 
@@ -158,9 +166,9 @@ export default function AdminCommentsPage() {
             {comments.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">暂无符合条件的评论</p>}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 pt-2">
-                <Button variant="outline" size="icon" onClick={() => loadComments(pagination.page - 1, pagination.pageSize)} disabled={pagination.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="outline" size="icon" onClick={() => loadComments(pagination.page - 1, pagination.pageSize, query, pageKey)} disabled={pagination.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
                 <span className="min-w-20 text-center text-sm text-muted-foreground">{pagination.page} / {pagination.totalPages}</span>
-                <Button variant="outline" size="icon" onClick={() => loadComments(pagination.page + 1, pagination.pageSize)} disabled={pagination.page >= pagination.totalPages}><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="outline" size="icon" onClick={() => loadComments(pagination.page + 1, pagination.pageSize, query, pageKey)} disabled={pagination.page >= pagination.totalPages}><ChevronRight className="h-4 w-4" /></Button>
               </div>
             )}
           </CardContent>
