@@ -55,7 +55,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <BackButton fallbackHref="/" />
+                  <BackButton fallbackHref="/" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white" />
                   <Link href="/profile/edit"><Button variant="secondary"><PencilLine className="mr-2 h-4 w-4" />编辑资料</Button></Link>
                   <Link href="/profile/password"><Button variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white"><KeyRound className="mr-2 h-4 w-4" />修改密码</Button></Link>
                 </div>

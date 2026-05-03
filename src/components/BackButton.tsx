@@ -4,7 +4,15 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function BackButton({ fallbackHref = '/' }: { fallbackHref?: string }) {
+export function BackButton({
+  fallbackHref = '/',
+  variant = 'outline',
+  className,
+}: {
+  fallbackHref?: string;
+  variant?: 'outline' | 'secondary';
+  className?: string;
+}) {
   const router = useRouter();
 
   const handleBack = () => {
@@ -16,7 +24,7 @@ export function BackButton({ fallbackHref = '/' }: { fallbackHref?: string }) {
   };
 
   return (
-    <Button variant="outline" onClick={handleBack}>
+    <Button variant={variant} onClick={handleBack} className={className}>
       <ChevronLeft className="mr-2 h-4 w-4" />
       返回上一页
     </Button>
