@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { CaptchaPreview } from '@/components/CaptchaPreview';
+import { AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -139,19 +140,7 @@ export default function LoginPage() {
                   className="flex-1"
                   maxLength={4}
                 />
-                <div 
-                  className="h-10 w-[120px] border rounded-md flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors overflow-hidden"
-                  onClick={fetchCaptcha}
-                  title="点击刷新验证码"
-                >
-                  {captchaLoading ? (
-                    <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
-                  ) : captchaSvg ? (
-                    <div dangerouslySetInnerHTML={{ __html: captchaSvg }} />
-                  ) : (
-                    <span className="text-xs text-muted-foreground">加载中...</span>
-                  )}
-                </div>
+                <CaptchaPreview svg={captchaSvg} loading={captchaLoading} onRefresh={fetchCaptcha} />
               </div>
               <p className="text-xs text-muted-foreground">点击图片可刷新验证码</p>
             </div>

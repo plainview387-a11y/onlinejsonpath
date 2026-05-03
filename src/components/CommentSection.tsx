@@ -22,6 +22,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { authFetch } from '@/lib/auth-client';
@@ -105,13 +115,12 @@ function HistoryModal({
     totalPages: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<HistoryComment | null>(null);
 
   const fetchMyComments = useCallback(async (page: number = 1) => {
     setLoading(true);
     try {
-      const res = await authFetch(
-        `/api/comments/my-comments?page=${page}&pageSize=${pagination.pageSize}`,
-      );
+      const res = await authFetch(`/api/comments/my-comments?page=${page}&pageSize=${pagination.pageSize}`);
       const data = await res.json();
 
       if (data.success) {
@@ -127,23 +136,26 @@ function HistoryModal({
     }
   }, [pagination.pageSize]);
 
-  const handleDeleteHistoryComment = async (comment: HistoryComment) => {
+  const requestDeleteHistoryComment = (comment: HistoryComment) => {
     if (!comment.canDelete) {
       toast.error('该评论当前不可删除');
       return;
     }
+    setPendingDelete(comment);
+  };
 
-    const confirmed = window.confirm('确认删除这条评论吗？');
-    if (!confirmed) return;
+  const confirmDeleteHistoryComment = async () => {
+    if (!pendingDelete) return;
 
     try {
-      const res = await authFetch(`/api/comments?id=${encodeURIComponent(comment.id)}`, {
+      const res = await authFetch(`/api/comments?id=${encodeURIComponent(pendingDelete.id)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
 
       if (data.success) {
         toast.success('评论已删除');
+        setPendingDelete(null);
         fetchMyComments(pagination.page);
       } else {
         toast.error(data.error || '删除评论失败');
@@ -162,93 +174,110 @@ function HistoryModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
-      <Card className="max-h-[82vh] w-full overflow-hidden rounded-b-none border-0 shadow-2xl sm:max-w-2xl sm:rounded-lg sm:border">
-        <CardHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <History className="h-4 w-4" />
-            我的评论
-          </CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="max-h-[68vh] overflow-y-auto p-0">
-          {loading ? (
-            <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              加载中
-            </div>
-          ) : comments.length > 0 ? (
-            <div>
-              {comments.map((comment) => (
-                <div key={comment.id} className="border-b px-4 py-4 last:border-b-0">
-                  <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px]">
-                      {comment.pageName}
-                    </Badge>
-                    {comment.isReply && (
-                      <span className="flex items-center gap-1">
-                        <CornerDownRight className="h-3 w-3" />
-                        回复
-                      </span>
-                    )}
-                    <span>{formatTime(comment.createdAt)}</span>
+    <>
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
+        <Card className="max-h-[82vh] w-full overflow-hidden rounded-b-none border-0 shadow-2xl sm:max-w-2xl sm:rounded-lg sm:border">
+          <CardHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <History className="h-4 w-4" />
+              我的评论
+            </CardTitle>
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <CardContent className="max-h-[68vh] overflow-y-auto p-0">
+            {loading ? (
+              <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                加载中
+              </div>
+            ) : comments.length > 0 ? (
+              <div>
+                {comments.map((comment) => (
+                  <div key={comment.id} className="border-b px-4 py-4 last:border-b-0">
+                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px]">
+                        {comment.pageName}
+                      </Badge>
+                      {comment.isReply && (
+                        <span className="flex items-center gap-1">
+                          <CornerDownRight className="h-3 w-3" />
+                          回复
+                        </span>
+                      )}
+                      <span>{formatTime(comment.createdAt)}</span>
+                    </div>
+                    <p className="break-words whitespace-pre-wrap text-sm leading-6">{comment.content}</p>
+                    <div className="mt-3 flex items-center gap-2">
+                      {comment.canDelete ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-full px-3 text-xs"
+                          onClick={() => requestDeleteHistoryComment(comment)}
+                        >
+                          <Trash2 className="mr-1 h-3.5 w-3.5" />
+                          删除
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">有回复的主评论暂不支持删除</span>
+                      )}
+                    </div>
                   </div>
-                  <p className="break-words text-sm leading-6 whitespace-pre-wrap">{comment.content}</p>
-                  <div className="mt-3 flex items-center gap-2">
-                    {comment.canDelete ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 rounded-full px-3 text-xs"
-                        onClick={() => handleDeleteHistoryComment(comment)}
-                      >
-                        <Trash2 className="mr-1 h-3.5 w-3.5" />
-                        删除
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">有回复的主评论暂不支持删除</span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
 
-              {pagination.totalPages > 1 && (
-                <div className="sticky bottom-0 flex items-center justify-center gap-2 border-t bg-card/95 p-3 backdrop-blur">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => fetchMyComments(pagination.page - 1)}
-                    disabled={pagination.page <= 1}
-                    className="h-8 w-8"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="min-w-14 text-center text-xs text-muted-foreground">
-                    {pagination.page} / {pagination.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => fetchMyComments(pagination.page + 1)}
-                    disabled={pagination.page >= pagination.totalPages}
-                    className="h-8 w-8"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="py-12 text-center text-muted-foreground">
-              <MessageSquare className="mx-auto mb-2 h-8 w-8 opacity-50" />
-              <p className="text-sm">暂无评论记录</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                {pagination.totalPages > 1 && (
+                  <div className="sticky bottom-0 flex items-center justify-center gap-2 border-t bg-card/95 p-3 backdrop-blur">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => fetchMyComments(pagination.page - 1)}
+                      disabled={pagination.page <= 1}
+                      className="h-8 w-8"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="min-w-14 text-center text-xs text-muted-foreground">
+                      {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => fetchMyComments(pagination.page + 1)}
+                      disabled={pagination.page >= pagination.totalPages}
+                      className="h-8 w-8"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="py-12 text-center text-muted-foreground">
+                <MessageSquare className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                <p className="text-sm">暂无评论记录</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>删除这条评论？</AlertDialogTitle>
+            <AlertDialogDescription>
+              删除后不可恢复。如果这是主评论，只有在没有回复时才允许删除。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteHistoryComment}>确认删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -285,16 +314,10 @@ function CommentItem({
       <CommentAvatar user={comment.user} size={isReply ? 'sm' : 'md'} />
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-sm font-medium text-foreground/90">
-            {comment.user.nickname}
-          </span>
-          <span className="shrink-0 text-xs text-muted-foreground">
-            {formatTime(comment.createdAt)}
-          </span>
+          <span className="truncate text-sm font-medium text-foreground/90">{comment.user.nickname}</span>
+          <span className="shrink-0 text-xs text-muted-foreground">{formatTime(comment.createdAt)}</span>
         </div>
-        <p className="mt-1 break-words text-sm leading-6 text-foreground/85 whitespace-pre-wrap">
-          {comment.content}
-        </p>
+        <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-6 text-foreground/85">{comment.content}</p>
         <div className="mt-2 flex items-center gap-1">
           <Button
             variant="ghost"
@@ -337,15 +360,14 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [pendingDelete, setPendingDelete] = useState<Comment | null>(null);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const fetchComments = useCallback(async (page: number = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/comments?pageKey=${pageKey}&page=${page}&pageSize=${pagination.pageSize}`,
-      );
+      const res = await fetch(`/api/comments?pageKey=${pageKey}&page=${page}&pageSize=${pagination.pageSize}`);
       const data = await res.json();
 
       if (data.success) {
@@ -366,9 +388,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   }, [fetchComments]);
 
   const sortedComments = useMemo(() => {
-    return [...comments].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    return [...comments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [comments]);
 
   const handleSubmit = async () => {
@@ -450,23 +470,26 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
     });
   };
 
-  const handleDelete = async (comment: Comment) => {
+  const requestDelete = (comment: Comment) => {
     if (!user) {
       toast.error('请先登录');
       return;
     }
+    setPendingDelete(comment);
+  };
 
-    const confirmed = window.confirm('确认删除这条评论吗？');
-    if (!confirmed) return;
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
 
     try {
-      const res = await authFetch(`/api/comments?id=${encodeURIComponent(comment.id)}`, {
+      const res = await authFetch(`/api/comments?id=${encodeURIComponent(pendingDelete.id)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
 
       if (data.success) {
         toast.success('评论已删除');
+        setPendingDelete(null);
         fetchComments(1);
       } else {
         toast.error(data.error || '删除评论失败');
@@ -491,14 +514,10 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <MessageCircle className="h-5 w-5" />
               评论
-              <span className="text-sm font-normal text-muted-foreground">
-                {pagination.total} 条
-              </span>
+              <span className="text-sm font-normal text-muted-foreground">{pagination.total} 条</span>
             </CardTitle>
             <div className="flex items-center gap-2">
-              <div className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                默认按最新排序
-              </div>
+              <div className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">默认按最新排序</div>
               {user && (
                 <Button
                   variant="ghost"
@@ -520,9 +539,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
               <div className="flex gap-3">
                 <Avatar className="h-9 w-9 border bg-muted">
                   <AvatarImage src={user.avatar || undefined} alt={user.nickname} />
-                  <AvatarFallback className="text-xs font-medium">
-                    {getInitial(user.nickname)}
-                  </AvatarFallback>
+                  <AvatarFallback className="text-xs font-medium">{getInitial(user.nickname)}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   {replyingTo && (
@@ -530,12 +547,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                       <span className="min-w-0 truncate text-muted-foreground">
                         回复 <span className="text-foreground">@{replyingTo.user.nickname}</span>
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 shrink-0"
-                        onClick={cancelReply}
-                      >
+                      <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={cancelReply}>
                         <X className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -549,11 +561,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                         handleSubmit();
                       }
                     }}
-                    placeholder={
-                      replyingTo
-                        ? `回复 @${replyingTo.user.nickname}，友善交流一下`
-                        : '留下你的看法，和大家聊聊'
-                    }
+                    placeholder={replyingTo ? `回复 @${replyingTo.user.nickname}，友善交流一下` : '留下你的看法，和大家聊聊'}
                     className="min-h-20 resize-none rounded-lg bg-card text-sm leading-6"
                     maxLength={MAX_COMMENT_LENGTH}
                   />
@@ -570,17 +578,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                           取消
                         </Button>
                       )}
-                      <Button
-                        onClick={handleSubmit}
-                        disabled={submitting || !content.trim()}
-                        size="sm"
-                        className="rounded-full px-4"
-                      >
-                        {submitting ? (
-                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Send className="mr-1 h-4 w-4" />
-                        )}
+                      <Button onClick={handleSubmit} disabled={submitting || !content.trim()} size="sm" className="rounded-full px-4">
+                        {submitting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-4 w-4" />}
                         {replyingTo ? '回复' : '发布'}
                       </Button>
                     </div>
@@ -597,15 +596,11 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium">登录后参与评论</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      回复、点赞和查看自己的评论记录
-                    </p>
+                    <p className="truncate text-xs text-muted-foreground">回复、点赞和查看自己的评论记录</p>
                   </div>
                 </div>
                 <Link href="/login">
-                  <Button size="sm" className="shrink-0 rounded-full">
-                    去登录
-                  </Button>
+                  <Button size="sm" className="shrink-0 rounded-full">去登录</Button>
                 </Link>
               </div>
             </div>
@@ -621,9 +616,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
               {sortedComments.map((comment) => {
                 const replies = comment.replies || [];
                 const isExpanded = expandedReplies.has(comment.id);
-                const visibleReplies = isExpanded
-                  ? replies
-                  : replies.slice(0, INITIAL_REPLY_COUNT);
+                const visibleReplies = isExpanded ? replies : replies.slice(0, INITIAL_REPLY_COUNT);
                 const hiddenReplyCount = replies.length - visibleReplies.length;
 
                 return (
@@ -631,7 +624,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                     <CommentItem
                       comment={comment}
                       onReply={handleReply}
-                      onDelete={handleDelete}
+                      onDelete={requestDelete}
                       canDelete={user?.id === comment.user.id && (comment.replies?.length || 0) === 0}
                     />
 
@@ -643,7 +636,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                               key={reply.id}
                               comment={reply}
                               onReply={handleReply}
-                              onDelete={handleDelete}
+                              onDelete={requestDelete}
                               canDelete={user?.id === reply.user.id}
                               isReply
                             />
@@ -656,9 +649,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                             className="h-7 rounded-full px-2 text-xs text-muted-foreground"
                             onClick={() => toggleReplies(comment.id)}
                           >
-                            {isExpanded
-                              ? '收起回复'
-                              : `展开 ${hiddenReplyCount} 条回复`}
+                            {isExpanded ? '收起回复' : `展开 ${hiddenReplyCount} 条回复`}
                           </Button>
                         )}
                       </div>
@@ -678,9 +669,7 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <span className="min-w-16 text-center text-sm text-muted-foreground">
-                    {pagination.page} / {pagination.totalPages}
-                  </span>
+                  <span className="min-w-16 text-center text-sm text-muted-foreground">{pagination.page} / {pagination.totalPages}</span>
                   <Button
                     variant="outline"
                     size="icon"
@@ -703,6 +692,21 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
       </Card>
 
       <HistoryModal isOpen={showHistory} onClose={() => setShowHistory(false)} />
+
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除评论？</AlertDialogTitle>
+            <AlertDialogDescription>
+              删除后不可恢复。如果这条评论下面还有回复，系统会拒绝删除主评论。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>确认删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
