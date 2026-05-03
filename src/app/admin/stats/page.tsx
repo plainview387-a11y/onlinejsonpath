@@ -101,7 +101,10 @@ export default function AdminStatsPage() {
         </Card>
 
         <Card className="shadow-sm">
-          <CardHeader><CardTitle>按工具查看评论</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>按工具查看评论</CardTitle>
+            <p className="text-sm text-muted-foreground">按工具快速进入评论管理页，自动带上对应筛选条件。</p>
+          </CardHeader>
           <CardContent className="space-y-3">
             {sortedToolUsage.map(([key, count], index) => (
               <Link key={key} href={`/admin/comments?pageKey=${encodeURIComponent(key)}`}>

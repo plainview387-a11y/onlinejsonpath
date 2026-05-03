@@ -77,7 +77,10 @@ export default function AdminDashboardPage() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <Card className="shadow-sm">
-          <CardHeader><CardTitle>后台模块</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>后台模块</CardTitle>
+            <p className="text-sm text-muted-foreground">统一进入各个后台功能模块，优先处理评论与数据概览。</p>
+          </CardHeader>
           <CardContent className="grid gap-4">
             {quickLinks.map((item) => {
               const Icon = item.icon;
@@ -104,7 +107,10 @@ export default function AdminDashboardPage() {
         </Card>
 
         <Card className="shadow-sm">
-          <CardHeader><CardTitle>当前最活跃工具</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>当前最活跃工具</CardTitle>
+            <p className="text-sm text-muted-foreground">点击条目可直接进入对应工具的评论筛选结果。</p>
+          </CardHeader>
           <CardContent className="space-y-3">
             {topTools.map(([key, count], index) => (
               <Link key={key} href={`/admin/comments?pageKey=${encodeURIComponent(key)}`}>

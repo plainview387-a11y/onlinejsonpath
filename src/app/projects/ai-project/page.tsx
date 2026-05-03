@@ -46,20 +46,16 @@ const highlights = [
 
 const aboutItems = [
   {
-    title: '我擅长做什么',
-    text: '我更擅长前端开发、后台管理系统、小程序和门户类项目，也能够配合后端接口、权限模型、数据展示等业务场景完成整套功能落地。',
+    title: '我擅长的方向',
+    text: '我更擅长前端开发、后台管理系统、小程序和门户类项目，也能够配合接口、权限模型和数据展示场景完成整套功能落地。',
   },
   {
-    title: '我重视什么体验',
-    text: '我希望系统不是只有功能，而是让用户一看就知道怎么用，页面加载顺畅、交互直接、结构清晰、长期也容易维护。',
-  },
-  {
-    title: '我比较有兴趣的方向',
-    text: '企业后台系统、教育平台、微信小程序、数据展示工具，以及可以和 AI 或自动化能力结合的业务型产品。',
+    title: '我重视的结果',
+    text: '相比只完成页面，我更在意交互是否清晰、结构是否稳定、系统是否易于维护，以及功能上线后能否继续扩展。',
   },
   {
     title: '我希望带来的价值',
-    text: '把复杂需求拆清楚，把页面做稳定，把使用路径做顺，让一个项目不只是能上线，而且能持续用得住。',
+    text: '把复杂需求拆清楚，把功能做稳定，把使用路径做顺，让系统既能上线，也能长期用得住。',
   },
 ];
 
@@ -130,22 +126,16 @@ const projects = [
 
 const posts = [
   {
-    title: '后台系统为什么权限模型要尽早想清楚',
+    title: '权限模型应该尽早想清楚',
     category: '系统设计',
     date: '2026-04-18',
-    excerpt: '权限设计如果前期没有想清楚，后面补起来会很痛苦，尤其是角色、按钮和接口级权限同时存在的时候。',
+    excerpt: '后台系统里的角色、按钮和接口权限如果前期没有梳理清楚，后期补起来成本会明显变高。',
   },
   {
-    title: '做小程序时，性能优化往往比功能堆砌更重要',
+    title: '小程序性能优化通常比继续堆功能更重要',
     category: '性能优化',
     date: '2026-04-05',
-    excerpt: '当商品、图片和列表数据变多之后，加载速度和渲染体验会直接影响转化和留存。',
-  },
-  {
-    title: '为什么我很看重页面是否足够直观',
-    category: '产品思考',
-    date: '2026-03-22',
-    excerpt: '用户未必关心你用了什么框架，但一定会在意他能不能快速找到功能、顺利完成操作。',
+    excerpt: '当商品、图片和列表数据持续增加之后，加载速度和渲染体验会直接影响业务效果。',
   },
 ];
 
@@ -466,7 +456,7 @@ export default function AIProjectPage() {
             title="补充说明"
             description="以下内容用于补充说明我关注的问题类型、做事方式和项目判断标准。"
           />
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
             {posts.map((post) => (
               <Card key={post.title} className="shadow-sm">
                 <CardContent className="p-6">
@@ -545,7 +535,7 @@ export default function AIProjectPage() {
                   <CardContent className="p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-foreground/70">更适合聊的话题</p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {['业务系统', '自动化工具', '数据平台', 'AI 提效'].map((tag) => (
+                      {['业务系统', '小程序', '数据平台', '业务工具'].map((tag) => (
                         <Badge key={tag} variant="outline" className="rounded-full border-white/20 text-primary-foreground">
                           {tag}
                         </Badge>
