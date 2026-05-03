@@ -44,10 +44,7 @@ export function AdminShell({
                   <h1 className="text-2xl font-semibold md:text-3xl">{title}</h1>
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-white/75">{description}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <BackButton fallbackHref="/profile" />
-                  {actions}
-                </div>
+                {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
               </div>
             </div>
 
@@ -80,7 +77,12 @@ export function AdminShell({
           </CardContent>
         </Card>
 
-        <div className="mt-6">{children}</div>
+        <div className="mt-6 space-y-4">
+          <div>
+            <BackButton fallbackHref="/profile" />
+          </div>
+          {children}
+        </div>
       </div>
     </div>
   );

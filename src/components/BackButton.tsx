@@ -26,7 +26,7 @@ export function BackButton({
   return (
     <Button variant={variant} onClick={handleBack} className={className}>
       <ChevronLeft className="mr-2 h-4 w-4" />
-      返回上一页
+      返回
     </Button>
   );
 }
