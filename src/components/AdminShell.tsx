@@ -10,6 +10,7 @@ import { BackButton } from '@/components/BackButton';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
+  { href: '/admin', label: '控制台', icon: Shield, desc: '查看后台总入口与摘要' },
   { href: '/admin/stats', label: '统计概览', icon: BarChart3, desc: '查看站点核心数据' },
   { href: '/admin/users', label: '用户管理', icon: Users, desc: '浏览注册用户列表' },
   { href: '/admin/comments', label: '评论管理', icon: MessageSquare, desc: '维护工具页评论内容' },
@@ -50,7 +51,7 @@ export function AdminShell({
               </div>
             </div>
 
-            <div className="grid gap-3 border-b bg-muted/25 p-4 md:grid-cols-3 md:p-5">
+            <div className="grid gap-3 border-b bg-muted/25 p-4 md:grid-cols-2 xl:grid-cols-4 md:p-5">
               {adminNav.map((item) => {
                 const Icon = item.icon;
                 const active = pathname === item.href;

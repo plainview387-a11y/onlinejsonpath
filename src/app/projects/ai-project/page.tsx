@@ -207,7 +207,7 @@ export default function AIProjectPage() {
       <section className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 md:px-8 md:py-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
         <div className="flex flex-col pt-4 md:pt-6 lg:pt-10">
           <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-sm">
-            作品集 / 在线简历 / 项目展示页
+            在线简历 / 项目作品 / 求职展示
           </Badge>
           <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
             你好，我是 {profile.name}
@@ -225,7 +225,7 @@ export default function AIProjectPage() {
             <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
               <a href={profile.resumeUrl}>
                 <Download className="mr-2 h-4 w-4" />
-                看简历
+                下载简历
               </a>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full rounded-full sm:w-auto">
@@ -257,7 +257,7 @@ export default function AIProjectPage() {
           <CardContent className="relative p-5 sm:p-6 md:p-8">
             <div className="flex items-center justify-between gap-4">
               <Badge variant="outline" className="rounded-full bg-background/80">
-                Young / Clear / Product-minded
+                Frontend / System / Delivery
               </Badge>
               <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground shadow-sm">
                 {profile.avatarInitials}
@@ -275,7 +275,7 @@ export default function AIProjectPage() {
                     <Sparkles className="mt-1 h-5 w-5 shrink-0" />
                   </div>
                   <p className="mt-4 text-sm leading-7 text-primary-foreground/85">
-                    我更喜欢做那种真正有人在用、能帮团队省时间、而且能长期维护的系统和工具。
+                    我更偏向参与真实业务场景中的系统建设，关注交付质量、维护成本和长期可用性。
                   </p>
                 </CardContent>
               </Card>
@@ -283,9 +283,9 @@ export default function AIProjectPage() {
               <div className="grid gap-4 lg:grid-cols-2">
                 <Card>
                   <CardContent className="p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">我常做的方向</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">核心方向</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {['业务系统', '自动化工具', '数据看板', '知识库', 'AI 提效'].map((tag) => (
+                      {['后台系统', '小程序', '数据展示', '门户系统', '业务工具'].map((tag) => (
                         <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1.5 text-sm font-medium">
                           {tag}
                         </Badge>
@@ -296,7 +296,7 @@ export default function AIProjectPage() {
 
                 <Card>
                   <CardContent className="p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">我重视的体验</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">我重视的特性</p>
                     <ul className="mt-4 space-y-3 text-sm">
                       <li>• 页面一看就知道怎么用</li>
                       <li>• 流程清楚，不靠人反复提醒</li>
@@ -308,9 +308,9 @@ export default function AIProjectPage() {
 
               <Card>
                 <CardContent className="p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">一句话理解我</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">一句话概括</p>
                   <p className="mt-3 text-base leading-8">
-                    我不是只想把页面做出来，而是想把事情做顺，把系统做稳，把使用体验做得更轻松。
+                    我希望把需求理解、页面实现和系统落地串起来，而不是只停留在功能完成。
                   </p>
                 </CardContent>
               </Card>
@@ -385,8 +385,8 @@ export default function AIProjectPage() {
       <section id="projects" className="mx-auto max-w-7xl px-4 py-20 md:px-8">
         <SectionHeading
           eyebrow="Projects"
-          title="我做过的项目"
-          description="这里放的不是纯展示型作品，而是更偏实际使用、流程优化和系统落地的项目。"
+          title="项目经历"
+          description="以下内容更偏向真实业务项目经验，重点体现系统实现、业务理解与落地能力。"
         />
         <div className="mt-10 grid gap-5 lg:grid-cols-3">
           {projects.map((project, index) => (
@@ -463,8 +463,8 @@ export default function AIProjectPage() {
         <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
           <SectionHeading
             eyebrow="Writing"
-            title="一些思考和记录"
-            description="项目展示的是结果，文章更适合表达我怎么理解问题、怎么判断方案。"
+            title="补充说明"
+            description="这里保留一些补充信息，用于说明我更关注的问题类型和做事方式。"
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {posts.map((post) => (
@@ -537,9 +537,9 @@ export default function AIProjectPage() {
             <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">Contact</p>
-                <h2 className="mt-3 text-3xl font-semibold">如果你也在做系统或工具类项目，欢迎联系我</h2>
+                <h2 className="mt-3 text-3xl font-semibold">如果你正在寻找偏系统实现和业务落地的前端 / 全栈同学，欢迎联系我</h2>
                 <p className="mt-4 leading-8 text-primary-foreground/80">
-                  我更希望参与那些真的能改善协作、流程和效率的项目，而不是只停留在“做个页面”的层面。
+                  我更希望参与有明确业务目标、重视执行质量和长期迭代的项目或岗位。
                 </p>
                 <Card className="mt-6 border-white/10 bg-white/10 text-primary-foreground">
                   <CardContent className="p-4">
