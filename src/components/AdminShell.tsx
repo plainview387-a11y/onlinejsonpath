@@ -6,6 +6,7 @@ import { BarChart3, MessageSquare, Shield, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { BackButton } from '@/components/BackButton';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
@@ -42,7 +43,10 @@ export function AdminShell({
                   <h1 className="text-2xl font-semibold md:text-3xl">{title}</h1>
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-white/75">{description}</p>
                 </div>
-                {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+                <div className="flex flex-wrap gap-2">
+                  <BackButton fallbackHref="/profile" />
+                  {actions}
+                </div>
               </div>
             </div>
 
