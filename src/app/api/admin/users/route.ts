@@ -15,16 +15,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
+    const query = (searchParams.get('query') || '').trim();
     const offset = (page - 1) * pageSize;
 
-    const [{ count }, { data, error }] = await Promise.all([
-      client.from('users').select('*', { count: 'exact', head: true }),
-      client
-        .from('users')
-        .select('id, email, nickname, avatar, created_at')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + pageSize - 1),
-    ]);
+    let builder = client
+      .from('users')
+      .select('id, email, nickname, avatar, created_at', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (query) {
+      builder = builder.or(`email.ilike.%${query}%,nickname.ilike.%${query}%`);
+    }
+
+    const { data, error, count } = await builder.range(offset, offset + pageSize - 1);
 
     if (error) {
       return NextResponse.json({ error: '获取用户列表失败' }, { status: 500 });
