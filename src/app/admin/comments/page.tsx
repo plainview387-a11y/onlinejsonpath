@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { authFetch } from '@/lib/auth-client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,12 +44,36 @@ interface Pagination {
 export default function AdminCommentsPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const { language } = useLanguage();
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [query, setQuery] = useState('');
   const [pageKey, setPageKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 20, total: 0, totalPages: 0 });
   const [pendingDelete, setPendingDelete] = useState<AdminComment | null>(null);
+
+  const copy = {
+    title: language === 'zh' ? '评论管理' : 'Comment Management',
+    desc: language === 'zh' ? '在这里集中查看工具页评论、按页面和关键词筛选，并处理不合适的评论内容。' : 'Review tool comments, filter by page or keyword, and moderate inappropriate content.',
+    searchComment: language === 'zh' ? '搜索评论内容...' : 'Search comment content...',
+    searchPage: language === 'zh' ? '按页面标识筛选，如 jsonpath' : 'Filter by page key, e.g. jsonpath',
+    search: language === 'zh' ? '查询' : 'Search',
+    clear: language === 'zh' ? '清空' : 'Clear',
+    total: language === 'zh' ? '共' : 'Total',
+    comments: language === 'zh' ? '条评论' : 'comments',
+    currentPage: language === 'zh' ? '当前第' : 'Page',
+    currentFilter: language === 'zh' ? '当前筛选' : 'Current filter',
+    list: language === 'zh' ? '评论列表' : 'Comment List',
+    reply: language === 'zh' ? '回复' : 'Reply',
+    noEmail: language === 'zh' ? '无邮箱' : 'No email',
+    delete: language === 'zh' ? '删除' : 'Delete',
+    empty: language === 'zh' ? '暂无符合条件的评论' : 'No matching comments',
+    loading: language === 'zh' ? '加载中...' : 'Loading...',
+    confirmTitle: language === 'zh' ? '确认删除这条评论？' : 'Delete this comment?',
+    confirmDesc: language === 'zh' ? '管理员删除同样遵循当前限制：如果主评论下还有回复，系统会拒绝直接删除。' : 'Admin deletion follows the same rule: if a top-level comment still has replies, direct deletion is blocked.',
+    confirm: language === 'zh' ? '确认删除' : 'Confirm Delete',
+    cancel: language === 'zh' ? '取消' : 'Cancel',
+  };
 
   const loadComments = useCallback(async (targetPage = pagination.page, targetPageSize = pagination.pageSize, nextQuery = query, nextPageKey = pageKey) => {
     setLoading(true);
@@ -65,15 +90,15 @@ export default function AdminCommentsPage() {
         setComments(data.data.comments || []);
         setPagination(data.data.pagination);
       } else {
-        toast.error(data.error || '无权限访问');
+        toast.error(data.error || (language === 'zh' ? '无权限访问' : 'No access'));
         router.push('/profile');
       }
     } catch {
-      toast.error('网络错误');
+      toast.error(language === 'zh' ? '网络错误' : 'Network error');
     } finally {
       setLoading(false);
     }
-  }, [pageKey, pagination.page, pagination.pageSize, query, router]);
+  }, [pageKey, pagination.page, pagination.pageSize, query, router, language]);
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/login');
@@ -105,65 +130,60 @@ export default function AdminCommentsPage() {
       const res = await authFetch(`/api/admin/comments?id=${encodeURIComponent(pendingDelete.id)}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
-        toast.success('评论已删除');
+        toast.success(language === 'zh' ? '评论已删除' : 'Comment deleted');
         setPendingDelete(null);
         loadComments(pagination.page, pagination.pageSize, query, pageKey);
       } else {
-        toast.error(data.error || '删除评论失败');
+        toast.error(data.error || (language === 'zh' ? '删除评论失败' : 'Failed to delete comment'));
       }
     } catch {
-      toast.error('网络错误');
+      toast.error(language === 'zh' ? '网络错误' : 'Network error');
     }
   };
 
   if (isLoading || loading) {
-    return <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />加载中...</div>;
+    return <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />{copy.loading}</div>;
   }
 
   return (
     <>
-      <AdminShell title="评论管理" description="在这里集中查看工具页评论、按页面和关键词筛选，并处理不合适的评论内容。">
+      <AdminShell title={copy.title} description={copy.desc}>
         <AdminToolbar>
           <div className="space-y-4">
             <div className="grid gap-3 md:grid-cols-[1fr_220px_140px_auto_auto]">
-              <Input placeholder="搜索评论内容..." value={query} onChange={(e) => setQuery(e.target.value)} />
-              <Input placeholder="按页面标识筛选，如 jsonpath" value={pageKey} onChange={(e) => setPageKey(e.target.value)} />
+              <Input placeholder={copy.searchComment} value={query} onChange={(e) => setQuery(e.target.value)} />
+              <Input placeholder={copy.searchPage} value={pageKey} onChange={(e) => setPageKey(e.target.value)} />
               <select className="h-10 rounded-md border bg-background px-3 text-sm" value={pagination.pageSize} onChange={(e) => changePageSize(Number(e.target.value))}>
-                {[10, 20, 50, 100].map((size) => <option key={size} value={size}>{size} / 页</option>)}
+                {[10, 20, 50, 100].map((size) => <option key={size} value={size}>{size} / page</option>)}
               </select>
-              <Button onClick={handleSearch}>查询</Button>
-              <Button variant="ghost" onClick={clearFilters}>清空</Button>
+              <Button onClick={handleSearch}>{copy.search}</Button>
+              <Button variant="ghost" onClick={clearFilters}>{copy.clear}</Button>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span>共 {pagination.total} 条评论，当前第 {pagination.page} / {Math.max(pagination.totalPages, 1)} 页</span>
-              {pageKey ? <Badge variant="secondary">当前筛选：{pageKey}</Badge> : null}
+              <span>{copy.total} {pagination.total} {copy.comments}，{copy.currentPage} {pagination.page} / {Math.max(pagination.totalPages, 1)}</span>
+              {pageKey ? <Badge variant="secondary">{copy.currentFilter}: {pageKey}</Badge> : null}
             </div>
           </div>
         </AdminToolbar>
 
         <Card>
-          <CardHeader><CardTitle>评论列表</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{copy.list}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {comments.map((item) => (
               <div key={item.id} className="rounded-2xl border bg-background p-4 shadow-sm">
                 <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant="secondary">{item.pageKey}</Badge>
-                  {item.isReply && <Badge variant="outline">回复</Badge>}
-                  <span>{new Date(item.createdAt).toLocaleString('zh-CN')}</span>
+                  {item.isReply && <Badge variant="outline">{copy.reply}</Badge>}
+                  <span>{new Date(item.createdAt).toLocaleString(language === 'zh' ? 'zh-CN' : 'en-US')}</span>
                 </div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-medium">{item.user.nickname}</div>
-                    <div className="text-xs text-muted-foreground">{item.user.email || '无邮箱'} · {item.user.id.slice(0, 8)}...</div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setPendingDelete(item)}>
-                    <Trash2 className="mr-1 h-4 w-4" />删除
-                  </Button>
+                  <div><div className="text-sm font-medium">{item.user.nickname}</div><div className="text-xs text-muted-foreground">{item.user.email || copy.noEmail} · {item.user.id.slice(0, 8)}...</div></div>
+                  <Button variant="outline" size="sm" onClick={() => setPendingDelete(item)}><Trash2 className="mr-1 h-4 w-4" />{copy.delete}</Button>
                 </div>
                 <p className="whitespace-pre-wrap text-sm leading-7">{item.content}</p>
               </div>
             ))}
-            {comments.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">暂无符合条件的评论</p>}
+            {comments.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">{copy.empty}</p>}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 pt-2">
                 <Button variant="outline" size="icon" onClick={() => loadComments(pagination.page - 1, pagination.pageSize, query, pageKey)} disabled={pagination.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
@@ -178,12 +198,12 @@ export default function AdminCommentsPage() {
       <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认删除这条评论？</AlertDialogTitle>
-            <AlertDialogDescription>管理员删除同样遵循当前限制：如果主评论下还有回复，系统会拒绝直接删除。</AlertDialogDescription>
+            <AlertDialogTitle>{copy.confirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{copy.confirmDesc}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>确认删除</AlertDialogAction>
+            <AlertDialogCancel>{copy.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>{copy.confirm}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

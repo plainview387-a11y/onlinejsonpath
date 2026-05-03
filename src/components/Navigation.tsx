@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   DropdownMenu,
@@ -12,19 +13,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Code,
-  User as UserIcon,
-  LogOut,
-  Wrench,
-  BriefcaseBusiness,
-} from 'lucide-react';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { Code, User as UserIcon, LogOut, Wrench, BriefcaseBusiness } from 'lucide-react';
 import { TOOLS } from '@/lib/tools';
 
 export function Navigation() {
   const { user, logout } = useAuth();
+  const { language } = useLanguage();
   const pathname = usePathname();
   const router = useRouter();
+
+  const copy = {
+    brand: language === 'zh' ? 'ToolNest' : 'ToolNest',
+    home: language === 'zh' ? '首页' : 'Home',
+    project: language === 'zh' ? '作品页' : 'Portfolio',
+    toolbox: language === 'zh' ? '工具箱' : 'Tools',
+    profile: language === 'zh' ? '个人中心' : 'Profile',
+    logout: language === 'zh' ? '退出登录' : 'Logout',
+    login: language === 'zh' ? '登录' : 'Login',
+    register: language === 'zh' ? '注册' : 'Register',
+  };
 
   const handleLogout = () => {
     logout();
@@ -36,7 +44,7 @@ export function Navigation() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
           <Code className="h-6 w-6" />
-          <span className="text-lg font-bold">在线工具集</span>
+          <span className="text-lg font-bold">{copy.brand}</span>
         </Link>
 
         <div className="hidden items-center space-x-1 md:flex">
@@ -46,7 +54,7 @@ export function Navigation() {
               pathname === '/' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             }`}
           >
-            首页
+            {copy.home}
           </Link>
 
           <Link
@@ -70,7 +78,7 @@ export function Navigation() {
                 }`}
               >
                 <Wrench className="mr-1 h-4 w-4" />
-                工具箱
+                {copy.toolbox}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
@@ -90,6 +98,7 @@ export function Navigation() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <LanguageToggle />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -111,13 +120,13 @@ export function Navigation() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
                     <UserIcon className="mr-2 h-4 w-4" />
-                    个人中心
+                    {copy.profile}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  退出登录
+                  {copy.logout}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -125,11 +134,11 @@ export function Navigation() {
             <div className="flex items-center space-x-2">
               <Link href="/login">
                 <Button variant="ghost" size="sm">
-                  登录
+                  {copy.login}
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="sm">注册</Button>
+                <Button size="sm">{copy.register}</Button>
               </Link>
             </div>
           )}
