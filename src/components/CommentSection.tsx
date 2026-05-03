@@ -6,14 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CornerDownRight,
-  Heart,
   History,
   Loader2,
   MessageCircle,
   MessageSquare,
   Send,
   SmilePlus,
-  Sparkles,
   Trash2,
   User,
   X,
@@ -53,8 +51,6 @@ interface CommentSectionProps {
   pageKey: string;
 }
 
-type SortMode = 'hot' | 'new';
-
 interface HistoryComment {
   id: string;
   content: string;
@@ -92,10 +88,6 @@ function formatTime(dateStr: string): string {
 
 function getInitial(name?: string) {
   return name?.trim().slice(0, 1).toUpperCase() || 'U';
-}
-
-function getLocalLikesKey(pageKey: string) {
-  return `comment-liked:${pageKey}`;
 }
 
 function HistoryModal({
@@ -278,20 +270,14 @@ function CommentAvatar({
 function CommentItem({
   comment,
   onReply,
-  onLike,
   onDelete,
   canDelete,
-  liked,
-  likeCount,
   isReply = false,
 }: {
   comment: Comment;
   onReply: (comment: Comment) => void;
-  onLike: (commentId: string) => void;
   onDelete: (comment: Comment) => void;
   canDelete: boolean;
-  liked: boolean;
-  likeCount: number;
   isReply?: boolean;
 }) {
   return (
@@ -318,18 +304,6 @@ function CommentItem({
           >
             <MessageSquare className="mr-1 h-3.5 w-3.5" />
             回复
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              'h-7 rounded-full px-2 text-xs text-muted-foreground hover:text-foreground',
-              liked && 'text-rose-500 hover:text-rose-500',
-            )}
-            onClick={() => onLike(comment.id)}
-          >
-            <Heart className={cn('mr-1 h-3.5 w-3.5', liked && 'fill-current')} />
-            {likeCount > 0 ? likeCount : '赞'}
           </Button>
           {canDelete && (
             <Button
@@ -362,24 +336,9 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   const [submitting, setSubmitting] = useState(false);
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [sortMode, setSortMode] = useState<SortMode>('hot');
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
-  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(getLocalLikesKey(pageKey));
-    if (saved) {
-      try {
-        setLikedIds(new Set(JSON.parse(saved)));
-      } catch {
-        setLikedIds(new Set());
-      }
-    } else {
-      setLikedIds(new Set());
-    }
-  }, [pageKey]);
 
   const fetchComments = useCallback(async (page: number = 1) => {
     setLoading(true);
@@ -407,20 +366,10 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
   }, [fetchComments]);
 
   const sortedComments = useMemo(() => {
-    const next = [...comments];
-    if (sortMode === 'new') {
-      return next.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-    }
-
-    return next.sort((a, b) => {
-      const aScore = (a.replies?.length || 0) * 2 + (likedIds.has(a.id) ? 1 : 0);
-      const bScore = (b.replies?.length || 0) * 2 + (likedIds.has(b.id) ? 1 : 0);
-      if (bScore !== aScore) return bScore - aScore;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }, [comments, likedIds, sortMode]);
+    return [...comments].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }, [comments]);
 
   const handleSubmit = async () => {
     if (!user) {
@@ -458,7 +407,6 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
         toast.success(replyingTo ? '回复发布成功' : '评论发布成功');
         setContent('');
         setReplyingTo(null);
-        setSortMode('new');
         fetchComments(replyingTo ? pagination.page : 1);
       } else {
         toast.error(data.error || '评论发布失败');
@@ -488,19 +436,6 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
 
   const cancelReply = () => {
     setReplyingTo(null);
-  };
-
-  const toggleLike = (commentId: string) => {
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(commentId)) {
-        next.delete(commentId);
-      } else {
-        next.add(commentId);
-      }
-      localStorage.setItem(getLocalLikesKey(pageKey), JSON.stringify([...next]));
-      return next;
-    });
   };
 
   const toggleReplies = (commentId: string) => {
@@ -561,24 +496,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
               </span>
             </CardTitle>
             <div className="flex items-center gap-2">
-              <div className="flex rounded-full bg-muted p-1">
-                <Button
-                  variant={sortMode === 'hot' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 rounded-full px-3 text-xs"
-                  onClick={() => setSortMode('hot')}
-                >
-                  <Sparkles className="mr-1 h-3.5 w-3.5" />
-                  热门
-                </Button>
-                <Button
-                  variant={sortMode === 'new' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 rounded-full px-3 text-xs"
-                  onClick={() => setSortMode('new')}
-                >
-                  最新
-                </Button>
+              <div className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                默认按最新排序
               </div>
               {user && (
                 <Button
@@ -712,11 +631,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                     <CommentItem
                       comment={comment}
                       onReply={handleReply}
-                      onLike={toggleLike}
                       onDelete={handleDelete}
                       canDelete={user?.id === comment.user.id && (comment.replies?.length || 0) === 0}
-                      liked={likedIds.has(comment.id)}
-                      likeCount={likedIds.has(comment.id) ? 1 : 0}
                     />
 
                     {replies.length > 0 && (
@@ -727,11 +643,8 @@ export function CommentSection({ pageKey }: CommentSectionProps) {
                               key={reply.id}
                               comment={reply}
                               onReply={handleReply}
-                              onLike={toggleLike}
                               onDelete={handleDelete}
                               canDelete={user?.id === reply.user.id}
-                              liked={likedIds.has(reply.id)}
-                              likeCount={likedIds.has(reply.id) ? 1 : 0}
                               isReply
                             />
                           ))}

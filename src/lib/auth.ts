@@ -1,8 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createHash } from 'crypto';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { getJwtSecret } from '@/lib/env';
 
 export interface AuthTokenPayload {
   userId: string;
@@ -31,7 +30,7 @@ export function generateToken(
 ): string {
   return jwt.sign(
     { userId, email, nickname, avatar },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: '7d' }
   );
 }
@@ -39,7 +38,7 @@ export function generateToken(
 // 验证 JWT Token
 export function verifyToken(token: string): AuthTokenPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthTokenPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as AuthTokenPayload;
     return decoded;
   } catch {
     return null;

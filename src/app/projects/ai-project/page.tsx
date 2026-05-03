@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowUpRight,
@@ -18,23 +19,23 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { profile } from '@/lib/portfolio';
 
-const profile = {
-  name: 'xxx',
-  role: '前端开发 / 全栈开发 / 产品实现',
-  location: '上海',
-  tagline:
-    '擅长 Web 前端、管理系统、小程序和数据展示场景，喜欢把复杂需求做成直观、稳定、好维护的产品。',
-  intro:
-    '我目前更关注前端工程化、后台管理系统、微信小程序、数据展示和业务工具方向。相比单纯完成页面，我更在意交互是不是顺手、结构是不是清楚、系统是不是稳定，以及功能上线之后能不能长期维护和继续扩展。',
-  email: '2719263509@qq.com',
-  phone: '18155884720',
-  school: '池州学院',
-  major: '数据科学与大数据技术',
-  resumeUrl: '/xxx-resume.pdf',
-  avatarInitials: 'NX',
-  status: '可交流前端 / 全栈 / 实施开发相关机会',
-  availability: '期望工作地点上海，期望岗位偏实施工程师 / 前端开发 / 系统开发',
+export const metadata: Metadata = {
+  title: 'AIProject 作品页 / 在线简历',
+  description:
+    '牛晓龙的在线作品展示页，包含项目经历、技能结构、在线简历与联系方式，适合招聘、作品投递与项目展示。',
+  keywords: ['牛晓龙', '前端开发', '全栈开发', '作品集', '在线简历', '项目展示'],
+  alternates: {
+    canonical: '/projects/ai-project',
+  },
+  openGraph: {
+    title: '牛晓龙 - AIProject 作品页 / 在线简历',
+    description:
+      '展示项目经验、技能能力、简历信息与联系方式的在线作品页。',
+    url: 'https://onlinejsonpath.vercel.app/projects/ai-project',
+    type: 'profile',
+  },
 };
 
 const highlights = [

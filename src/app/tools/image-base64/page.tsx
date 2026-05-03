@@ -1,27 +1,75 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import Image from 'next/image';
+import { useMemo, useRef, useState } from 'react';
 import { ToolLayout, EditorPanel, ActionButtons } from '@/components/ToolComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Download, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { CommentSection } from '@/components/CommentSection';
+
+function inferMimeFromBase64(value: string) {
+  const match = value.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+  return match?.[1] || 'image/png';
+}
+
+function inferExtension(mime: string) {
+  const mapping: Record<string, string> = {
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'image/gif': 'gif',
+    'image/webp': 'webp',
+    'image/svg+xml': 'svg',
+  };
+  return mapping[mime] || 'png';
+}
+
+function normalizeBase64Image(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return { valid: false as const, error: '请输入 Base64 内容' };
+  }
+
+  if (trimmed.startsWith('data:image')) {
+    return { valid: true as const, dataUrl: trimmed, mime: inferMimeFromBase64(trimmed) };
+  }
+
+  const normalized = trimmed.replace(/\s+/g, '');
+  if (!/^[A-Za-z0-9+/=]+$/.test(normalized)) {
+    return { valid: false as const, error: 'Base64 内容格式不正确' };
+  }
+
+  return {
+    valid: true as const,
+    dataUrl: `data:image/png;base64,${normalized}`,
+    mime: 'image/png',
+  };
+}
 
 export default function ImageBase64Page() {
   const [mode, setMode] = useState<'image-to-base64' | 'base64-to-image'>('image-to-base64');
   const [base64, setBase64] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
   const [fileName, setFileName] = useState('image.png');
+  const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 图片转Base64
+  const imageMeta = useMemo(() => {
+    if (!base64) return null;
+    const mime = inferMimeFromBase64(base64);
+    const pure = base64.includes(',') ? base64.split(',')[1] : base64.replace(/\s+/g, '');
+    const sizeBytes = Math.floor((pure.length * 3) / 4);
+    return { mime, sizeBytes };
+  }, [base64]);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setError('');
     setFileName(file.name);
 
     const reader = new FileReader();
@@ -33,21 +81,22 @@ export default function ImageBase64Page() {
     reader.readAsDataURL(file);
   };
 
-  // Base64转图片
   const handleBase64Convert = () => {
-    if (!base64) return;
-
-    // 如果没有data:image前缀，自动添加
-    let dataUrl = base64;
-    if (!base64.startsWith('data:image')) {
-      dataUrl = `data:image/png;base64,${base64}`;
+    const result = normalizeBase64Image(base64);
+    if (!result.valid) {
+      setError(result.error);
+      setPreviewUrl('');
+      return;
     }
 
-    setPreviewUrl(dataUrl);
-    setImageUrl(dataUrl);
+    setError('');
+    setPreviewUrl(result.dataUrl);
+    if (!fileName.trim() || fileName === 'image.png') {
+      setFileName(`image.${inferExtension(result.mime)}`);
+    }
+    toast.success('图片解析成功');
   };
 
-  // 下载图片
   const handleDownload = () => {
     if (!previewUrl) return;
 
@@ -59,22 +108,18 @@ export default function ImageBase64Page() {
     document.body.removeChild(link);
   };
 
-  // 清空
   const handleClear = () => {
     setBase64('');
     setPreviewUrl('');
-    setImageUrl('');
     setFileName('image.png');
+    setError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   return (
-    <ToolLayout
-      title="图片 Base64 互转工具"
-      description="图片与Base64互转，支持上传预览和下载"
-    >
+    <ToolLayout title="图片 Base64 互转工具" description="图片与 Base64 互转，支持上传预览、格式识别和下载">
       <Tabs value={mode} onValueChange={(v) => setMode(v as 'image-to-base64' | 'base64-to-image')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="image-to-base64">图片转Base64</TabsTrigger>
@@ -82,25 +127,23 @@ export default function ImageBase64Page() {
         </TabsList>
 
         <TabsContent value="image-to-base64" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">上传图片</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-center w-full">
+                <div className="flex w-full items-center justify-center">
                   <label
                     htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                      <Upload className="mb-3 h-10 w-10 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                         <span className="font-semibold">点击上传</span> 或拖拽文件
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        PNG, JPG, GIF, WEBP
-                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF, WEBP</p>
                     </div>
                     <input
                       id="image-upload"
@@ -115,12 +158,10 @@ export default function ImageBase64Page() {
 
                 {previewUrl && (
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground mb-2">预览：</p>
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="max-w-full h-auto max-h-48 mx-auto rounded border"
-                    />
+                    <p className="mb-2 text-sm text-muted-foreground">预览：</p>
+                    <div className="relative mx-auto h-48 w-full overflow-hidden rounded border bg-muted/20">
+                      <Image src={previewUrl} alt="Preview" fill className="object-contain" unoptimized />
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -133,20 +174,20 @@ export default function ImageBase64Page() {
                   <ActionButtons onClear={handleClear} onCopy={() => {}} value={base64} />
                 </div>
               </CardHeader>
-              <CardContent>
-                <EditorPanel
-                  value={base64}
-                  onChange={() => {}}
-                  placeholder="Base64编码结果..."
-                  readOnly
-                />
+              <CardContent className="space-y-3">
+                <EditorPanel value={base64} onChange={() => {}} placeholder="Base64编码结果..." readOnly />
+                {imageMeta && (
+                  <div className="text-xs text-muted-foreground">
+                    MIME：{imageMeta.mime} · 约 {(imageMeta.sizeBytes / 1024).toFixed(1)} KB
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="base64-to-image" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -155,11 +196,7 @@ export default function ImageBase64Page() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <EditorPanel
-                  value={base64}
-                  onChange={setBase64}
-                  placeholder="输入Base64编码..."
-                />
+                <EditorPanel value={base64} onChange={setBase64} placeholder="输入 Base64 编码..." />
                 <div className="flex gap-2">
                   <Label htmlFor="filename">文件名：</Label>
                   <input
@@ -167,9 +204,10 @@ export default function ImageBase64Page() {
                     type="text"
                     value={fileName}
                     onChange={(e) => setFileName(e.target.value)}
-                    className="flex-1 px-3 py-1 text-sm border rounded"
+                    className="flex-1 rounded border px-3 py-1 text-sm"
                   />
                 </div>
+                {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
                 <Button onClick={handleBase64Convert} className="w-full">
                   转换为图片
                 </Button>
@@ -182,7 +220,7 @@ export default function ImageBase64Page() {
                   <CardTitle className="text-lg">图片预览</CardTitle>
                   {previewUrl && (
                     <Button variant="outline" size="sm" onClick={handleDownload}>
-                      <Download className="h-4 w-4 mr-1" />
+                      <Download className="mr-1 h-4 w-4" />
                       下载图片
                     </Button>
                   )}
@@ -190,16 +228,12 @@ export default function ImageBase64Page() {
               </CardHeader>
               <CardContent>
                 {previewUrl ? (
-                  <div className="flex items-center justify-center min-h-[300px] border rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="max-w-full h-auto max-h-[400px] rounded"
-                    />
+                  <div className="relative min-h-[300px] overflow-hidden rounded-lg border bg-gray-50 dark:bg-gray-800">
+                    <Image src={previewUrl} alt="Preview" fill className="object-contain p-3" unoptimized />
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center min-h-[300px] border rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <ImageIcon className="w-16 h-16 text-gray-300 mb-2" />
+                  <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border bg-gray-50 dark:bg-gray-800">
+                    <ImageIcon className="mb-2 h-16 w-16 text-gray-300" />
                     <p className="text-sm text-gray-400">图片预览区域</p>
                   </div>
                 )}
@@ -209,7 +243,6 @@ export default function ImageBase64Page() {
         </TabsContent>
       </Tabs>
 
-      {/* 评论区 */}
       <div className="mt-10 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { getJwtSecret } from '@/lib/env';
 
 /**
  * 验证验证码
@@ -14,7 +13,7 @@ export function verifyCaptcha(token: string, code: string): { valid: boolean; er
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { code: string; timestamp: number };
+    const decoded = jwt.verify(token, getJwtSecret()) as { code: string; timestamp: number };
     
     // 比对验证码（忽略大小写）
     if (decoded.code === code.toLowerCase().trim()) {

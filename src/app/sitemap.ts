@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { TOOLS } from '@/lib/tools';
 
 const siteUrl = 'https://onlinejsonpath.vercel.app';
 
@@ -30,20 +31,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.3,
     },
-    ...[
-      'jsonpath',
-      'base64',
-      'timestamp',
-      'json-escape',
-      'text-stats',
-      'image-base64',
-      'ip-query',
-      'java-to-node',
-    ].map((slug) => ({
-      url: `${siteUrl}/tools/${slug}`,
+    ...TOOLS.map((tool) => ({
+      url: `${siteUrl}${tool.href}`,
       lastModified: now,
       changeFrequency: 'weekly' as const,
-      priority: slug === 'jsonpath' ? 0.95 : 0.85,
+      priority: tool.priority ?? 0.85,
     })),
   ];
 }

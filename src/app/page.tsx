@@ -4,94 +4,8 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { 
-  Braces, 
-  Lock, 
-  Clock, 
-  FileJson, 
-  FileText, 
-  Image,
-  Globe,
-  Wrench,
-  Search,
-  X,
-  Code
-} from 'lucide-react';
-
-const tools = [
-  {
-    href: '/tools/jsonpath',
-    title: 'JSONPath 解析',
-    description: 'JSON路径解析工具，支持JSON编辑、格式校验、JSONPath语法高亮',
-    icon: Braces,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-50 dark:bg-blue-950',
-    keywords: ['json', 'jsonpath', '解析', '路径', '查询'],
-  },
-  {
-    href: '/tools/base64',
-    title: 'Base64 加解密',
-    description: 'Base64编码解码工具，支持文本和文件的双向转换',
-    icon: Lock,
-    color: 'text-green-500',
-    bgColor: 'bg-green-50 dark:bg-green-950',
-    keywords: ['base64', '编码', '解码', '加密', '解密'],
-  },
-  {
-    href: '/tools/timestamp',
-    title: '时间戳转换',
-    description: 'Unix时间戳与日期时间互转，支持秒级和毫秒级',
-    icon: Clock,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-50 dark:bg-purple-950',
-    keywords: ['时间戳', 'timestamp', '日期', '时间', '转换'],
-  },
-  {
-    href: '/tools/json-escape',
-    title: 'JSON 转义',
-    description: 'JSON转义与反转义工具，支持格式化和错误提示',
-    icon: FileJson,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-50 dark:bg-orange-950',
-    keywords: ['json', '转义', '反转义', '格式化', 'escape'],
-  },
-  {
-    href: '/tools/text-stats',
-    title: '文本统计',
-    description: '实时统计文本字符数、空格数、行数、段落数',
-    icon: FileText,
-    color: 'text-pink-500',
-    bgColor: 'bg-pink-50 dark:bg-pink-950',
-    keywords: ['文本', '统计', '字符数', '行数', '字数'],
-  },
-  {
-    href: '/tools/image-base64',
-    title: '图片 Base64',
-    description: '图片与Base64互转，支持上传预览和下载',
-    icon: Image,
-    color: 'text-cyan-500',
-    bgColor: 'bg-cyan-50 dark:bg-cyan-950',
-    keywords: ['图片', 'image', 'base64', '转换', '预览'],
-  },
-  {
-    href: '/tools/ip-query',
-    title: 'IP 查询',
-    description: '查询当前IP地址信息，支持指定IP查询，显示地理位置',
-    icon: Globe,
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-50 dark:bg-indigo-950',
-    keywords: ['ip', '地址', '查询', '位置', '地理'],
-  },
-  {
-    href: '/tools/java-to-node',
-    title: 'Java 转 Node.js',
-    description: 'Java代码转换为Node.js代码，支持在线执行',
-    icon: Code,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-50 dark:bg-amber-950',
-    keywords: ['java', 'nodejs', 'javascript', '转换', '代码'],
-  },
-];
+import { Braces, Wrench, Search, X } from 'lucide-react';
+import { TOOLS } from '@/lib/tools';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,11 +13,11 @@ export default function HomePage() {
   // 实时搜索过滤
   const filteredTools = useMemo(() => {
     if (!searchQuery.trim()) {
-      return tools;
+      return TOOLS;
     }
     
     const query = searchQuery.toLowerCase();
-    return tools.filter(tool => 
+    return TOOLS.filter(tool => 
       tool.title.toLowerCase().includes(query) ||
       tool.description.toLowerCase().includes(query) ||
       tool.keywords.some(keyword => keyword.toLowerCase().includes(query))
@@ -120,7 +34,7 @@ export default function HomePage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">在线工具集</h1>
-            <p className="text-sm text-muted-foreground">8大实用工具，助力您的开发工作</p>
+            <p className="text-sm text-muted-foreground">{TOOLS.length} 个常用工具，覆盖开发中的高频处理场景</p>
           </div>
         </div>
         
@@ -195,7 +109,7 @@ export default function HomePage() {
               <span className="text-xs text-muted-foreground">精选 3 个高频工具</span>
             </div>
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-              {tools.slice(0, 3).map((tool) => {
+              {TOOLS.slice(0, 3).map((tool) => {
                 const Icon = tool.icon;
                 return (
                   <Link key={tool.href} href={tool.href} className="flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50">
@@ -229,7 +143,7 @@ export default function HomePage() {
             </div>
             {!searchQuery && (
               <span className="text-sm text-muted-foreground">
-                共 {tools.length} 个工具
+                共 {TOOLS.length} 个工具
               </span>
             )}
           </div>

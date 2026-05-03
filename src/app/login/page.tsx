@@ -80,7 +80,7 @@ export default function LoginPage() {
 
       login(data.token, data.user);
       router.push('/');
-    } catch (err) {
+    } catch {
       setError('登录失败，请稍后重试');
       fetchCaptcha();
     } finally {

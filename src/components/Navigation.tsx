@@ -17,25 +17,9 @@ import {
   User as UserIcon,
   LogOut,
   Wrench,
-  Braces,
-  Lock,
-  Clock,
-  FileJson,
-  FileText,
-  Image,
-  Globe,
   BriefcaseBusiness,
 } from 'lucide-react';
-
-const tools = [
-  { href: '/tools/jsonpath', label: 'JSONPath解析', icon: Braces },
-  { href: '/tools/base64', label: 'Base64加解密', icon: Lock },
-  { href: '/tools/timestamp', label: '时间戳转换', icon: Clock },
-  { href: '/tools/json-escape', label: 'JSON转义', icon: FileJson },
-  { href: '/tools/text-stats', label: '文本统计', icon: FileText },
-  { href: '/tools/image-base64', label: '图片Base64', icon: Image },
-  { href: '/tools/ip-query', label: 'IP查询', icon: Globe },
-];
+import { TOOLS } from '@/lib/tools';
 
 export function Navigation() {
   const { user, logout } = useAuth();
@@ -90,13 +74,13 @@ export function Navigation() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
-              {tools.map((tool) => {
+              {TOOLS.map((tool) => {
                 const Icon = tool.icon;
                 return (
                   <DropdownMenuItem key={tool.href} asChild>
                     <Link href={tool.href} className="cursor-pointer">
                       <Icon className="mr-2 h-4 w-4" />
-                      {tool.label}
+                      {tool.navLabel}
                     </Link>
                   </DropdownMenuItem>
                 );

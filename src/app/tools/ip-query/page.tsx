@@ -40,19 +40,18 @@ export default function IPQueryPage() {
   const [loadingQuery, setLoadingQuery] = useState(false);
   const [error, setError] = useState('');
 
-  // 获取当前IP
   const fetchCurrentIP = async () => {
     setLoadingCurrent(true);
     setError('');
     try {
       const response = await fetch('/api/ip-query');
       const data = await response.json();
-      
+
       if (!response.ok) {
-        setError(data.error || '获取当前IP失败');
+        setError(data.error || '获取当前 IP 失败');
         return;
       }
-      
+
       setCurrentIP(data.data);
     } catch {
       setError('网络错误，请稍后重试');
@@ -61,15 +60,14 @@ export default function IPQueryPage() {
     }
   };
 
-  // 查询指定IP
   const querySpecificIP = async () => {
     if (!ipInput.trim()) {
-      setError('请输入IP地址');
+      setError('请输入 IP 地址');
       return;
     }
 
     if (!isValidIPv4(ipInput)) {
-      setError('IP格式不正确，请输入正确的IPv4地址');
+      setError('IP 格式不正确，请输入正确的 IPv4 地址');
       return;
     }
 
@@ -78,12 +76,12 @@ export default function IPQueryPage() {
     try {
       const response = await fetch(`/api/ip-query?ip=${encodeURIComponent(ipInput.trim())}`);
       const data = await response.json();
-      
+
       if (!response.ok) {
-        setError(data.error || '查询IP失败');
+        setError(data.error || '查询 IP 失败');
         return;
       }
-      
+
       setQueryIP(data.data);
     } catch {
       setError('网络错误，请稍后重试');
@@ -92,7 +90,6 @@ export default function IPQueryPage() {
     }
   };
 
-  // 表格展示组件
   const IPTable = ({ data, title }: { data: IPInfo | null; title: string }) => {
     if (!data) return null;
 
@@ -110,7 +107,7 @@ export default function IPQueryPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <Globe className="h-5 w-5" />
             {title}
           </CardTitle>
@@ -120,16 +117,9 @@ export default function IPQueryPage() {
             <table className="w-full text-sm">
               <tbody>
                 {rows.map((row, index) => (
-                  <tr 
-                    key={row.label} 
-                    className={`${index < rows.length - 1 ? 'border-b' : ''} hover:bg-muted/50 transition-colors`}
-                  >
-                    <td className="py-3 px-4 font-medium text-muted-foreground w-32">
-                      {row.label}
-                    </td>
-                    <td className="py-3 px-4">
-                      {row.value || '-'}
-                    </td>
+                  <tr key={row.label} className={`${index < rows.length - 1 ? 'border-b' : ''} transition-colors hover:bg-muted/50`}>
+                    <td className="w-32 px-4 py-3 font-medium text-muted-foreground">{row.label}</td>
+                    <td className="px-4 py-3">{row.value || '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -141,29 +131,16 @@ export default function IPQueryPage() {
   };
 
   return (
-    <ToolLayout
-      title="IP 查询工具"
-      description="查询当前IP地址信息或指定IP地址的地理位置"
-    >
+    <ToolLayout title="IP 查询工具" description="查询当前 IP 地址信息或指定 IP 地址的地理位置">
       <div className="space-y-6">
-        {/* 错误提示 */}
-        {error && (
-          <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg">
-            {error}
-          </div>
-        )}
+        {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</div>}
 
-        {/* 获取当前IP */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">获取当前IP地址信息</CardTitle>
+            <CardTitle className="text-lg">获取当前 IP 地址信息</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button 
-              onClick={fetchCurrentIP} 
-              disabled={loadingCurrent}
-              className="w-full md:w-auto"
-            >
+            <Button onClick={fetchCurrentIP} disabled={loadingCurrent} className="w-full md:w-auto">
               {loadingCurrent ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -172,40 +149,34 @@ export default function IPQueryPage() {
               ) : (
                 <>
                   <Globe className="mr-2 h-4 w-4" />
-                  获取我的IP信息
+                  获取我的 IP 信息
                 </>
               )}
             </Button>
           </CardContent>
         </Card>
 
-        {/* 当前IP信息表格 */}
-        {currentIP && <IPTable data={currentIP} title="当前IP地址信息" />}
+        {currentIP && <IPTable data={currentIP} title="当前 IP 地址信息" />}
 
-        {/* 查询指定IP */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">查询指定IP地址信息</CardTitle>
+            <CardTitle className="text-lg">查询指定 IP 地址信息</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col gap-4 md:flex-row">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="ip-input">IP地址</Label>
+                <Label htmlFor="ip-input">IP 地址</Label>
                 <Input
                   id="ip-input"
                   type="text"
-                  placeholder="请输入IPv4地址，例如：119.123.72.166"
+                  placeholder="请输入 IPv4 地址，例如：119.123.72.166"
                   value={ipInput}
                   onChange={(e) => setIpInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && querySpecificIP()}
                 />
               </div>
               <div className="flex items-end">
-                <Button 
-                  onClick={querySpecificIP} 
-                  disabled={loadingQuery}
-                  className="w-full md:w-auto"
-                >
+                <Button onClick={querySpecificIP} disabled={loadingQuery} className="w-full md:w-auto">
                   {loadingQuery ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -220,48 +191,29 @@ export default function IPQueryPage() {
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              支持IPv4地址查询，例如：119.123.72.166、8.8.8.8
-            </p>
           </CardContent>
         </Card>
 
-        {/* 查询IP信息表格 */}
-        {queryIP && <IPTable data={queryIP} title={`IP地址 ${queryIP.ip} 的信息`} />}
-
-        {/* 使用说明 */}
-        <Card className="bg-muted/30">
-          <CardHeader>
-            <CardTitle className="text-base">使用说明</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-              <li>点击&quot;获取我的IP信息&quot;可查询您当前的IP地址及位置信息</li>
-              <li>在输入框中输入任意IPv4地址，点击&quot;查询&quot;可获取该IP的位置信息</li>
-              <li>查询结果包含：国家、省份、城市、运营商等详细信息</li>
-            </ul>
-          </CardContent>
-        </Card>
+        {queryIP && <IPTable data={queryIP} title="指定 IP 地址信息" />}
       </div>
 
-      {/* 评论区 */}
       <div className="mt-10 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">工具说明</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-            <p>IP 查询工具支持查看当前 IP 或指定 IP 的归属地、运营商和地理位置信息，适合网络排查、登录风险判断和安全分析。</p>
-            <p>如果你在处理访问日志、风控记录或用户来源判断，这个工具可以帮助你快速得到基础网络信息。</p>
+            <p>这个工具适合做网络排查、接口调试和地理位置快速判断。你可以直接查询当前 IP，也可以手动输入指定 IPv4 地址。</p>
+            <p>查询请求会发送到服务端接口，再由服务端向上游数据源获取结果，具体准确度取决于 IP 地理库本身。</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">常见问题</CardTitle>
+            <CardTitle className="text-lg">隐私与注意事项</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-            <p><strong>Q：</strong>为什么定位不是特别精确？<br /><strong>A：</strong>IP 查询通常只能定位到运营商或城市级别，不能保证精确到具体地址。</p>
-            <p><strong>Q：</strong>适合哪些场景？<br /><strong>A：</strong>登录风险排查、服务访问来源分析、接口调试和运营数据核对都很常见。</p>
+            <p><strong>隐私：</strong>点击“获取我的 IP 信息”时，服务端会处理当前请求来源地址并返回地理归属信息。</p>
+            <p><strong>限制：</strong>IP 地理位置只能用于近似判断，不代表精确物理定位；如果上游服务限流或异常，页面也可能查询失败。</p>
           </CardContent>
         </Card>
       </div>

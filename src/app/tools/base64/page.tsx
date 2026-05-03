@@ -7,6 +7,27 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { CommentSection } from '@/components/CommentSection';
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+function uint8ToBase64(bytes: Uint8Array) {
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function base64ToUint8(value: string) {
+  const normalized = value.replace(/\s+/g, '');
+  const binary = atob(normalized);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 function runBase64Convert(input: string, isEncode: boolean) {
   if (!input) {
     return { output: '', error: '' };
@@ -15,19 +36,19 @@ function runBase64Convert(input: string, isEncode: boolean) {
   try {
     if (isEncode) {
       return {
-        output: btoa(unescape(encodeURIComponent(input))),
+        output: uint8ToBase64(encoder.encode(input)),
         error: '',
       };
     }
 
     return {
-      output: decodeURIComponent(escape(atob(input))),
+      output: decoder.decode(base64ToUint8(input)),
       error: '',
     };
   } catch {
     return {
       output: '',
-      error: isEncode ? '编码失败' : '解码失败：输入不是有效的Base64字符串',
+      error: isEncode ? '编码失败' : '解码失败：输入不是有效的 Base64 字符串',
     };
   }
 }
@@ -60,10 +81,7 @@ export default function Base64Page() {
   };
 
   return (
-    <ToolLayout
-      title="Base64 加解密工具"
-      description="支持文本的 Base64 编码和解码，可实时自动转换"
-    >
+    <ToolLayout title="Base64 加解密工具" description="支持 UTF-8 文本的 Base64 编码和解码，可实时自动转换">
       <div className="space-y-4">
         <Card className="border-primary/10 shadow-sm">
           <CardHeader>
@@ -93,13 +111,11 @@ export default function Base64Page() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card className="shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">
-                  {isEncode ? '原始文本' : 'Base64 文本'}
-                </CardTitle>
+                <CardTitle className="text-lg">{isEncode ? '原始文本' : 'Base64 文本'}</CardTitle>
                 <ActionButtons onClear={handleClear} value={input} />
               </div>
             </CardHeader>
@@ -107,7 +123,7 @@ export default function Base64Page() {
               <EditorPanel
                 value={input}
                 onChange={setInput}
-                placeholder={isEncode ? '输入要编码的文本...' : '输入要解码的Base64文本...'}
+                placeholder={isEncode ? '输入要编码的文本...' : '输入要解码的 Base64 文本...'}
               />
             </CardContent>
           </Card>
@@ -115,15 +131,13 @@ export default function Base64Page() {
           <Card className="shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">
-                  {isEncode ? 'Base64 结果' : '解码结果'}
-                </CardTitle>
+                <CardTitle className="text-lg">{isEncode ? 'Base64 结果' : '解码结果'}</CardTitle>
                 <ActionButtons onSwap={handleSwap} onCopy={() => {}} value={output} />
               </div>
             </CardHeader>
             <CardContent>
               {error ? (
-                <div className="w-full h-[300px] flex items-center justify-center rounded-lg border bg-red-50 p-4 text-center text-red-600">
+                <div className="flex h-[300px] w-full items-center justify-center rounded-lg border bg-red-50 p-4 text-center text-red-600">
                   {error}
                 </div>
               ) : (
@@ -140,7 +154,7 @@ export default function Base64Page() {
             <CardTitle className="text-lg">工具说明</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-            <p>Base64 常用于接口传输、图片内联、签名串处理和调试排查。这个页面支持文本内容的在线编码与解码。</p>
+            <p>Base64 常用于接口传输、图片内联、签名串处理和调试排查。这个页面支持 UTF-8 文本内容的在线编码与解码。</p>
             <p>如果输入的内容不是合法 Base64，页面会直接给出错误提示，避免误把无效内容当成结果继续使用。</p>
           </CardContent>
         </Card>

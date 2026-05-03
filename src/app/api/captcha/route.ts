@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { getJwtSecret } from '@/lib/env';
 
 // 生成随机验证码文本
 function generateCode(length: number = 4): string {
@@ -74,7 +73,7 @@ export async function GET() {
     // 将验证码文本加密生成token（有效期5分钟）
     const token = jwt.sign(
       { code: code.toLowerCase(), timestamp: Date.now() },
-      JWT_SECRET,
+      getJwtSecret(),
       { expiresIn: '5m' }
     );
 
