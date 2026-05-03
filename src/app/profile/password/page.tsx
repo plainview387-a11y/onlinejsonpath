@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BackButton } from '@/components/BackButton';
 import { toast } from 'sonner';
 
 export default function ProfilePasswordPage() {
@@ -58,7 +57,7 @@ export default function ProfilePasswordPage() {
                 <CardTitle>修改密码</CardTitle>
                 <CardDescription>为了安全起见，需要先输入当前密码，再设置新密码。</CardDescription>
               </div>
-              <BackButton fallbackHref="/profile" />
+              <Button variant="outline" onClick={() => router.push('/profile')}>返回</Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">

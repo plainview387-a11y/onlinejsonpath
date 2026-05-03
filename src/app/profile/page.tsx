@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BackButton } from '@/components/BackButton';
 import { KeyRound, PencilLine, Shield, UserCircle2, CalendarDays, Mail } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -79,12 +78,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <div className="mt-6 space-y-4">
-          <div>
-            <BackButton fallbackHref="/" />
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -153,7 +147,6 @@ export default function ProfilePage() {
                 </Card>
               )}
             </div>
-          </div>
         </div>
       </div>
     </div>

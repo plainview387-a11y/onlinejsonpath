@@ -6,7 +6,6 @@ import { BarChart3, MessageSquare, Shield, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BackButton } from '@/components/BackButton';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
@@ -77,12 +76,7 @@ export function AdminShell({
           </CardContent>
         </Card>
 
-        <div className="mt-6 space-y-4">
-          <div>
-            <BackButton fallbackHref="/profile" />
-          </div>
-          {children}
-        </div>
+        <div className="mt-6">{children}</div>
       </div>
     </div>
   );

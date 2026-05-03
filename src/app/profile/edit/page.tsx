@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BackButton } from '@/components/BackButton';
 import { toast } from 'sonner';
 
 export default function ProfileEditPage() {
@@ -66,7 +65,7 @@ export default function ProfileEditPage() {
                 <CardTitle>修改个人信息</CardTitle>
                 <CardDescription>在这里更新昵称和头像，密码修改请走独立页面。</CardDescription>
               </div>
-              <BackButton fallbackHref="/profile" />
+              <Button variant="outline" onClick={() => router.push('/profile')}>返回</Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
