@@ -8,12 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { CaptchaPreview } from '@/components/CaptchaPreview';
 import { AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { language } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [captchaCode, setCaptchaCode] = useState('');
@@ -23,7 +25,26 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 获取验证码
+  const copy = {
+    title: language === 'zh' ? '登录' : 'Login',
+    desc: language === 'zh' ? '登录您的账号，使用 ToolNest 在线工具集' : 'Sign in to your account and use ToolNest online tools.',
+    email: language === 'zh' ? '邮箱' : 'Email',
+    password: language === 'zh' ? '密码' : 'Password',
+    captcha: language === 'zh' ? '验证码' : 'Captcha',
+    emailPlaceholder: 'your@email.com',
+    passwordPlaceholder: language === 'zh' ? '输入您的密码' : 'Enter your password',
+    captchaPlaceholder: language === 'zh' ? '请输入验证码' : 'Enter captcha',
+    captchaTip: language === 'zh' ? '点击图片可刷新验证码' : 'Click the image to refresh the captcha',
+    needEmailPassword: language === 'zh' ? '请填写邮箱和密码' : 'Please enter email and password',
+    needCaptcha: language === 'zh' ? '请输入验证码' : 'Please enter the captcha',
+    loginFailed: language === 'zh' ? '登录失败' : 'Login failed',
+    loginRetry: language === 'zh' ? '登录失败，请稍后重试' : 'Login failed, please try again later',
+    loading: language === 'zh' ? '登录中...' : 'Signing in...',
+    submit: language === 'zh' ? '登录' : 'Login',
+    noAccount: language === 'zh' ? '还没有账号？' : "Don't have an account?",
+    register: language === 'zh' ? '立即注册' : 'Register now',
+  };
+
   const fetchCaptcha = async () => {
     setCaptchaLoading(true);
     try {
@@ -35,13 +56,12 @@ export default function LoginPage() {
         setCaptchaCode('');
       }
     } catch (err) {
-      console.error('获取验证码失败:', err);
+      console.error(language === 'zh' ? '获取验证码失败:' : 'Failed to fetch captcha:', err);
     } finally {
       setCaptchaLoading(false);
     }
   };
 
-  // 页面加载时获取验证码
   useEffect(() => {
     fetchCaptcha();
   }, []);
@@ -51,12 +71,12 @@ export default function LoginPage() {
     setError('');
 
     if (!email || !password) {
-      setError('请填写邮箱和密码');
+      setError(copy.needEmailPassword);
       return;
     }
 
     if (!captchaCode) {
-      setError('请输入验证码');
+      setError(copy.needCaptcha);
       return;
     }
 
@@ -65,24 +85,22 @@ export default function LoginPage() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, captchaToken, captchaCode }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '登录失败');
-        fetchCaptcha(); // 刷新验证码
+        setError(data.error || copy.loginFailed);
+        fetchCaptcha();
         return;
       }
 
       login(data.token, data.user);
       router.push('/');
     } catch {
-      setError('登录失败，请稍后重试');
+      setError(copy.loginRetry);
       fetchCaptcha();
     } finally {
       setIsLoading(false);
@@ -90,71 +108,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">登录</CardTitle>
-          <CardDescription>登录您的账号，使用在线工具集</CardDescription>
+          <CardTitle className="text-2xl">{copy.title}</CardTitle>
+          <CardDescription>{copy.desc}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                <AlertCircle className="h-4 w-4" />
-                {error}
-              </div>
-            )}
+            {error && <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-600"><AlertCircle className="h-4 w-4" />{error}</div>}
 
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Label htmlFor="email">{copy.email}</Label>
+              <Input id="email" type="email" placeholder={copy.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="输入您的密码"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Label htmlFor="password">{copy.password}</Label>
+              <Input id="password" type="password" placeholder={copy.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
-            {/* 验证码 */}
             <div className="space-y-2">
-              <Label htmlFor="captcha">验证码</Label>
+              <Label htmlFor="captcha">{copy.captcha}</Label>
               <div className="flex gap-3">
-                <Input
-                  id="captcha"
-                  type="text"
-                  placeholder="请输入验证码"
-                  value={captchaCode}
-                  onChange={(e) => setCaptchaCode(e.target.value)}
-                  className="flex-1"
-                  maxLength={4}
-                />
+                <Input id="captcha" type="text" placeholder={copy.captchaPlaceholder} value={captchaCode} onChange={(e) => setCaptchaCode(e.target.value)} className="flex-1" maxLength={4} />
                 <CaptchaPreview svg={captchaSvg} loading={captchaLoading} onRefresh={fetchCaptcha} />
               </div>
-              <p className="text-xs text-muted-foreground">点击图片可刷新验证码</p>
+              <p className="text-xs text-muted-foreground">{copy.captchaTip}</p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? '登录中...' : '登录'}
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              还没有账号？{' '}
-              <Link href="/register" className="text-primary hover:underline">
-                立即注册
-              </Link>
-            </p>
+            <Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? copy.loading : copy.submit}</Button>
+            <p className="text-sm text-muted-foreground">{copy.noAccount}{' '}<Link href="/register" className="text-primary hover:underline">{copy.register}</Link></p>
           </CardFooter>
         </form>
       </Card>
